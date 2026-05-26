@@ -1,8 +1,8 @@
 # What is Arcidex?
 
-Arcidex is a learning platform for the Arcium ecosystem. It helps partner teams turn product documentation into **structured learning paths** with short comprehension checks, so they can see whether users actually understood their product—not just clicked through a doc.
+Arcidex is **onboarding infrastructure** for the Arcium ecosystem. It helps ecosystem teams turn complex protocol documentation into **guided onboarding programs**—with comprehension checks and measurable learner progress—so they can see whether users actually understood their product, not just clicked through a doc.
 
-Learners get **one account** and a **curated catalog** of programs. Partners get a governed way to ship onboarding content without building their own LMS (learning management system).
+Learners get **one account** and a **curated catalog** of programs. Partners get governed onboarding infrastructure—without building their own LMS—and clear outcomes from structured programs and progress data (see [Why partners use Arcidex](#why-partners-use-arcidex)).
 
 This document explains the product in plain language. For engineering detail, see the [design spec](superpowers/specs/2026-05-20-ecosystem-platform-design.md). For day-to-day agent rules, see [AGENT-PLATFORM.md](AGENT-PLATFORM.md).
 
@@ -10,7 +10,23 @@ This document explains the product in plain language. For engineering detail, se
 
 ## The idea in one sentence
 
-Arcidex is the shared place where ecosystem apps verify that users learned their product— with safe multi-partner hosting, staff oversight, and progress users can keep across visits.
+Arcidex helps ecosystem teams turn complex protocol documentation into guided onboarding programs—with comprehension checks and measurable learner progress.
+
+---
+
+## Why partners use Arcidex
+
+Partners are ecosystem teams (protocols, apps, tooling) who need users to **get productive**, not just read docs. Arcidex gives them a shared hub and governed program model so they can:
+
+| Outcome | What Arcidex enables |
+| --- | --- |
+| **Reduce onboarding friction** | Turn scattered protocol docs into a linear, guided path—one link, one program, clear next steps. |
+| **Improve activation** | Comprehension checks confirm users understood key concepts before they integrate or go deeper. |
+| **Standardize education** | Structured blocks and platform-defined quizzes keep quality consistent across programs and partner teams. |
+| **Identify drop-off points** | Lesson- and version-scoped progress shows where learners stall—before it shows up only in support tickets. |
+| **Prepare developers before support requests** | Quizzes and progress signal who completed fundamentals; partners spend support time on real blockers, not repeat basics. |
+
+Partners do **not** build custom courseware or run a separate LMS. Staff help new partners launch; trusted partners edit drafts under review (v1). Analytics and exports roll out in Phase 2+; the data model is designed for these outcomes from day one.
 
 ---
 
@@ -42,6 +58,10 @@ Arcidex is the shared place where ecosystem apps verify that users learned their
 - Try the first lesson as a guest, then sign up to save progress (planned for v1).
 
 ### Partners (ecosystem apps)
+
+**What they get:** See [Why partners use Arcidex](#why-partners-use-arcidex)—lower friction onboarding, better activation, standardized education, drop-off visibility, and developers prepared before support.
+
+**How they work with Arcidex:**
 
 - **New partners:** Submit an intake brief (goals, outline, assets). Staff builds the first version.
 - **Trusted partners (later):** Edit drafts in Partner Studio and submit for staff review.

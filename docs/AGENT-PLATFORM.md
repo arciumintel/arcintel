@@ -2,7 +2,7 @@
 
 **Read this before scaffolding, migrations, routes, or any feature that touches programs, lessons, partners, or the hub.**
 
-Arcidex is a **greenfield** multi-tenant learning checkpoint platform for the Arcium ecosystem. Each partner runs a **Program** (structured lessons + comprehension quizzes) under one curated hub. **Arcium Fundamentals** ships as **Program #1** at launch — seeded like any other program, not as a special code path.
+Arcidex is **greenfield** multi-tenant onboarding infrastructure for the Arcium ecosystem. Each partner runs a **Program** (structured lessons + comprehension quizzes) under one curated hub. **Arcium Fundamentals** ships as **Program #1** at launch — seeded like any other program, not as a special code path.
 
 When this file and the full design spec disagree, **follow the spec** unless the user explicitly changes direction.
 
@@ -10,7 +10,9 @@ When this file and the full design spec disagree, **follow the spec** unless the
 
 ## One-line thesis
 
-Arcidex is the shared learning checkpoint layer: ecosystem apps get verifiable comprehension paths; learners get one account and a curated hub; the platform owns structure, versioning, tenant isolation, and progress integrity.
+Arcidex helps ecosystem teams turn complex protocol documentation into guided onboarding programs—with comprehension checks and measurable learner progress. Internally, the platform owns structure, versioning, tenant isolation, and progress integrity; learners get one account and a curated hub.
+
+**Partner outcomes (product north star):** reduce onboarding friction, improve activation, standardize education, identify drop-off points, prepare developers before support requests.
 
 ---
 

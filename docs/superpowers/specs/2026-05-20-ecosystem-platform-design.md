@@ -1,4 +1,4 @@
-# Arcidex Ecosystem Learning Platform — Design Spec (Revised)
+# Arcidex Ecosystem Onboarding Infrastructure — Design Spec (Revised)
 
 **Status:** Draft for review  
 **Date:** 2026-05-20  
@@ -9,7 +9,7 @@
 
 ## 1. Executive summary
 
-Arcidex is pivoting from a single-product Arcium academy into a **multi-tenant learning checkpoint platform** for apps in the Arcium ecosystem. Each ecosystem partner runs a **Program** (structured lessons + comprehension quizzes) for its users under one **Arcidex hub**, with **Arcium as Program #1**.
+Arcidex is pivoting from a single-product Arcium academy into **multi-tenant onboarding infrastructure** for apps in the Arcium ecosystem. Each ecosystem partner runs a **Program** (structured lessons + comprehension quizzes) for its users under one **Arcidex hub**, with **Arcium as Program #1**.
 
 This revision strengthens the original plan where it was vague: **tenancy is first-class**, **published content is versioned and immutable**, **tenant isolation is enforced in the database and application layer**, **lesson content is block-structured**, **gamification is narrowed for v1**, and **events + analytics are designed in from the start** rather than bolted on later.
 
@@ -25,13 +25,23 @@ This revision strengthens the original plan where it was vague: **tenancy is fir
 
 ### What Arcidex is
 
-Arcidex is the **shared learning checkpoint layer** for the Arcium ecosystem:
+Arcidex is **onboarding infrastructure** for the Arcium ecosystem:
 
-- Partners need users to **understand** their product, not just click through docs.
+- Partners need users to **understand** their product, not just click through docs—and to **activate** with less friction, **consistent** education, **visible drop-off**, and **fewer unprepared support requests**.
 - Learners get **one account**, a **curated catalog**, and **consistent comprehension mechanics** (read → check → progress).
 - Arcidex owns **structure, integrity, and trust**—not partner product logic.
 
-**One-line thesis:** *Arcidex turns ecosystem documentation into verifiable learning paths—with tenant-safe authoring, versioned content, and event-backed progress.*
+**Partner outcomes:**
+
+| Outcome | Mechanism |
+| --- | --- |
+| Reduce onboarding friction | Guided programs replace doc sprawl; one hub link per product |
+| Improve activation | Comprehension checks gate “ready to build” confidence |
+| Standardize education | Block schema + platform quiz types + staff/trust governance |
+| Identify drop-off points | Lesson-version progress + funnel analytics (Phase 2+) |
+| Prepare developers before support | Progress + quiz pass signal before deep integration / support |
+
+**One-line thesis:** *Arcidex helps ecosystem teams turn complex protocol documentation into guided onboarding programs—with comprehension checks and measurable learner progress.*
 
 ### What Arcidex is not
 
