@@ -4,7 +4,7 @@ import { listPrograms } from "@/lib/preview-data";
 
 export const metadata = {
   title: "Programs",
-  description: "The full Arcidex program catalog — every learning path on the hub.",
+  description: "The full Arcademy program catalog — every learning path on the hub.",
 };
 
 export default async function ProgramsPage() {

@@ -178,7 +178,7 @@ export default function PortalNav() {
     >
       <Link
         href="/"
-        aria-label="Arcidex home"
+        aria-label="Arcademy home"
         className="mt-8 mb-10 block"
         style={{
           paddingLeft: collapsed ? "0" : "1.4rem",
@@ -199,7 +199,7 @@ export default function PortalNav() {
           {collapsed ? (
             <span>a<span className="text-accent">.</span></span>
           ) : (
-            <>arcidex<span className="text-accent">.</span></>
+            <>arcademy<span className="text-accent">.</span></>
           )}
         </span>
       </Link>

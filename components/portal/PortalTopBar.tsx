@@ -48,7 +48,7 @@ export default function PortalTopBar() {
         <div className="flex min-w-0 flex-1 items-center gap-4">
           {!isHome ? (
             <span className="hidden font-mono text-[0.6rem] uppercase tracking-[0.18em] text-ink-soft md:inline">
-              Arcidex
+              Arcademy
               <span aria-hidden className="mx-2 text-ink-faint">/</span>
             </span>
           ) : null}

@@ -161,7 +161,7 @@ try {
       type: "callout",
       variant: "note",
       text: {
-        en: "Published content in Arcidex is versioned and immutable once live.",
+        en: "Published content in Arcademy is versioned and immutable once live.",
       },
     },
   ];
@@ -170,7 +170,7 @@ try {
     {
       id: "q1",
       type: "true_false",
-      prompt: "Arcidex stores published lesson content in Postgres.",
+      prompt: "Arcademy stores published lesson content in Postgres.",
       points: 1,
       correctAnswer: "true",
     },

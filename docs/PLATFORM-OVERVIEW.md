@@ -1,8 +1,8 @@
-# What is Arcidex?
+# What is Arcademy?
 
-Arcidex is **ecosystem onboarding infrastructure** for the Arcium ecosystem—not an education platform or generic LMS. It helps ecosystem teams turn complex protocol documentation into **guided onboarding programs**—with comprehension checks and measurable progress—so they can see whether users actually understood a product before they go deeper or integrate, not just clicked through a doc.
+Arcademy is **ecosystem onboarding infrastructure** for the Arcium ecosystem—not an education platform or generic LMS. It helps ecosystem teams turn complex protocol documentation into **guided onboarding programs**—with comprehension checks and measurable progress—so they can see whether users actually understood a product before they go deeper or integrate, not just clicked through a doc.
 
-New users and developers get **one account** and a **curated catalog** of programs. Partners get governed onboarding infrastructure—without building their own onboarding stack from scratch—and clear outcomes from structured programs and progress data (see [Why partners use Arcidex](#why-partners-use-arcidex)).
+New users and developers get **one account** and a **curated catalog** of programs. Partners get governed onboarding infrastructure—without building their own onboarding stack from scratch—and clear outcomes from structured programs and progress data (see [Why partners use Arcademy](#why-partners-use-arcademy)).
 
 This document explains the product in plain language. For engineering detail, see the [design spec](superpowers/specs/2026-05-20-ecosystem-platform-design.md). For day-to-day agent rules, see [AGENT-PLATFORM.md](AGENT-PLATFORM.md).
 
@@ -10,15 +10,15 @@ This document explains the product in plain language. For engineering detail, se
 
 ## The idea in one sentence
 
-Arcidex is ecosystem onboarding infrastructure: guided programs, comprehension checks, and measurable progress for new user onboarding and developer adoption across the Arcium ecosystem.
+Arcademy is ecosystem onboarding infrastructure: guided programs, comprehension checks, and measurable progress for new user onboarding and developer adoption across the Arcium ecosystem.
 
 ---
 
-## Why partners use Arcidex
+## Why partners use Arcademy
 
-Partners are ecosystem teams (protocols, apps, tooling) who need new users to **activate** and developers to **integrate**—not just read docs. Arcidex gives them shared onboarding infrastructure and a governed program model so they can:
+Partners are ecosystem teams (protocols, apps, tooling) who need new users to **activate** and developers to **integrate**—not just read docs. Arcademy gives them shared onboarding infrastructure and a governed program model so they can:
 
-| Outcome | What Arcidex enables |
+| Outcome | What Arcademy enables |
 | --- | --- |
 | **Reduce onboarding friction** | Turn scattered protocol docs into a linear, guided path—one link, one program, clear next steps. |
 | **Improve activation** | Comprehension checks confirm users understood key concepts before they go deeper or integrate. |
@@ -43,18 +43,18 @@ Partners do **not** build bespoke onboarding from scratch or run a separate LMS.
 | **Draft** | Work-in-progress content authors can still edit. |
 | **Publish** | Staff action that freezes a snapshot of the draft and makes it the live version users see. Published content is not edited in place. |
 | **Enrollment** | A user’s membership in a specific program. Progress is tracked per program. |
-| **Staff** | Arcidex operators who curate the hub, onboard partners, review content, and publish. |
+| **Staff** | Arcademy operators who curate the hub, onboard partners, review content, and publish. |
 | **Trusted partner** | A partner who passed a manual quality gate and may edit **drafts** in Partner Studio. They still cannot go live without staff approval in v1. |
 
 ---
 
-## Who uses Arcidex?
+## Who uses Arcademy?
 
 ### Users & developers
 
 **What they get:** Progress that persists, completion that means something, and a path toward ecosystem readiness—not engagement gimmicks.
 
-| Focus | What Arcidex enables |
+| Focus | What Arcademy enables |
 | --- | --- |
 | **Progress continuity** | One account, enrollments pinned to curriculum versions, guest-to-account merge—pick up where you left off across sessions and programs. |
 | **Verified completion** | Quizzes and mastery thresholds confirm comprehension; progress ties to immutable `lesson_version` / `quiz_version` rows, not mutable docs. |
@@ -70,9 +70,9 @@ Partners do **not** build bespoke onboarding from scratch or run a separate LMS.
 
 ### Partners (ecosystem apps)
 
-**What they get:** See [Why partners use Arcidex](#why-partners-use-arcidex)—lower friction onboarding, better activation, standardized onboarding paths, drop-off visibility, and users prepared before deeper integration or support.
+**What they get:** See [Why partners use Arcademy](#why-partners-use-arcademy)—lower friction onboarding, better activation, standardized onboarding paths, drop-off visibility, and users prepared before deeper integration or support.
 
-**How they work with Arcidex:**
+**How they work with Arcademy:**
 
 - **New partners:** Submit an intake brief (goals, outline, assets). Staff builds the first version.
 - **Trusted partners (later):** Edit drafts in Partner Studio and submit for staff review.
@@ -119,7 +119,7 @@ Staff and partner authoring tools live under `/staff` and `/partner` (rolled out
 
 - Curated hub and program catalog
 - Reading-first lessons with platform-defined quizzes
-- One global Arcidex account
+- One global Arcademy account
 - Staff-built programs for new partners
 - Arcium as the first program at launch
 - **Progress continuity** across sessions (global account, version-pinned enrollments, guest merge)
@@ -143,13 +143,13 @@ Staff and partner authoring tools live under `/staff` and `/partner` (rolled out
 
 ## Proof-of-learning (future direction)
 
-Arcidex aligns with **infrastructure identity**, not consumer gamification or token incentives. After v1, the platform is designed to evolve toward **proof-of-learning**:
+Arcademy aligns with **infrastructure identity**, not consumer gamification or token incentives. After v1, the platform is designed to evolve toward **proof-of-learning**:
 
 | Direction | Purpose |
 | --- | --- |
 | **Signed completion attestations** | Cryptographically signed records that a learner completed a specific program version—verifiable by partners and tooling. |
 | **Ecosystem credentials** | Named credentials (e.g. “Arcium Fundamentals complete”) partners and the hub can trust for gating docs, support tiers, or beta access. |
-| **Portable progress records** | Learner-owned export of enrollment and completion history—useful across Arcidex programs without re-proving basics. |
+| **Portable progress records** | Learner-owned export of enrollment and completion history—useful across Arcademy programs without re-proving basics. |
 
 This is **not** a token rewards program. No points-for-completion, no NFT badges as the primary model. Events and version FKs in Phase 0–1 lay groundwork; attestations and credentials ship when legal and product gates clear (Phase 4+).
 
@@ -220,5 +220,5 @@ These are settled unless leadership explicitly reopens them:
 
 ## Branding
 
-- **Product name:** Arcidex
+- **Product name:** Arcademy
 - **First program:** Arcium Fundamentals (`arcium`)

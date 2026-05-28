@@ -15,7 +15,7 @@ export default async function HomePage() {
           <div className="flex items-center gap-3">
             <span aria-hidden className="block h-2 w-2 rounded-full bg-accent" />
             <span className="font-mono text-[0.66rem] uppercase tracking-[0.18em] text-ink-soft">
-              Arcidex hub / v1
+              Arcademy hub / v1
             </span>
           </div>
           <span className="hidden font-mono text-[0.66rem] uppercase tracking-[0.18em] text-ink-soft num-tabular md:inline">

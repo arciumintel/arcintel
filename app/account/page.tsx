@@ -3,7 +3,7 @@ import { ArrowUpRight } from "lucide-react";
 
 export const metadata = {
   title: "Account",
-  description: "Your enrollments and progress across every program on the Arcidex hub.",
+  description: "Your enrollments and progress across every program on the Arcademy hub.",
 };
 
 export default function AccountPage() {
@@ -28,7 +28,7 @@ export default function AccountPage() {
           Your enrollments<span className="text-accent">.</span>
         </h1>
         <p className="mt-7 max-w-[620px] font-sans text-[1.05rem] leading-[1.55] text-ink-muted">
-          One Arcidex account holds your progress across every program on the hub. Sign in to keep
+          One Arcademy account holds your progress across every program on the hub. Sign in to keep
           a lesson, restart a quiz, and resume where you left off.
         </p>
       </header>
@@ -41,7 +41,7 @@ export default function AccountPage() {
           You&rsquo;re reading without an account.
         </p>
         <p className="mt-4 font-sans text-[1rem] leading-[1.6] text-ink-muted">
-          Phase 1 of Arcidex includes a guest-friendly path: open Lesson 01 of any featured
+          Phase 1 of Arcademy includes a guest-friendly path: open Lesson 01 of any featured
           program, read it through, and choose to save progress on completion. Until you sign up,
           nothing is tracked beyond the current tab.
         </p>

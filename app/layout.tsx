@@ -6,16 +6,16 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: {
-    default: "Arcidex — Ecosystem onboarding for Arcium",
-    template: "%s | Arcidex",
+    default: "Arcademy — Ecosystem onboarding for Arcium",
+    template: "%s | Arcademy",
   },
   description:
-    "Arcidex is the shared learning checkpoint for the Arcium ecosystem. Partner apps verify user comprehension; learners get one account and a curated catalog of programs.",
-  keywords: ["Arcidex", "Arcium", "onboarding", "ecosystem", "learning", "MXE", "confidential compute"],
+    "Arcademy is the shared learning checkpoint for the Arcium ecosystem. Partner apps verify user comprehension; learners get one account and a curated catalog of programs.",
+  keywords: ["Arcademy", "Arcium", "onboarding", "ecosystem", "learning", "MXE", "confidential compute"],
   openGraph: {
-    siteName: "Arcidex",
+    siteName: "Arcademy",
     type: "website",
-    title: "Arcidex — Ecosystem onboarding for Arcium",
+    title: "Arcademy — Ecosystem onboarding for Arcium",
     description: "The shared learning checkpoint for the Arcium ecosystem.",
   },
 };

@@ -1,4 +1,4 @@
-# Arcidex Ecosystem Onboarding Infrastructure — Design Spec (Revised)
+# Arcademy Ecosystem Onboarding Infrastructure — Design Spec (Revised)
 
 **Status:** Draft for review  
 **Date:** 2026-05-20  
@@ -9,7 +9,7 @@
 
 ## 1. Executive summary
 
-Arcidex is **ecosystem onboarding infrastructure** for apps in the Arcium ecosystem—not an education platform or generic LMS. Each ecosystem partner runs a **Program** (structured lessons + comprehension quizzes) for its users under one **Arcidex hub**, with **Arcium as Program #1**.
+Arcademy is **ecosystem onboarding infrastructure** for apps in the Arcium ecosystem—not an education platform or generic LMS. Each ecosystem partner runs a **Program** (structured lessons + comprehension quizzes) for its users under one **Arcademy hub**, with **Arcium as Program #1**.
 
 This revision strengthens the original plan where it was vague: **tenancy is first-class**, **published content is versioned and immutable**, **tenant isolation is enforced in the database and application layer**, **lesson content is block-structured**, **onboarding integrity over gamification for v1**, and **events + analytics are designed in from the start** rather than bolted on later.
 
@@ -23,13 +23,13 @@ This revision strengthens the original plan where it was vague: **tenancy is fir
 
 ## 2. Revised strategic thesis
 
-### What Arcidex is
+### What Arcademy is
 
-Arcidex is **ecosystem onboarding infrastructure** for the Arcium ecosystem:
+Arcademy is **ecosystem onboarding infrastructure** for the Arcium ecosystem:
 
 - Partners need new users to **activate** and developers to **integrate**—not just click through docs—and to do so with less friction, **consistent onboarding**, **visible drop-off**, and **fewer unprepared support requests**.
 - Users get **progress continuity**, **verified completion**, and a path toward **ecosystem readiness**—not streaks or cosmetic rewards.
-- Arcidex owns **structure, integrity, and trust**—not partner product logic.
+- Arcademy owns **structure, integrity, and trust**—not partner product logic.
 
 **Partner outcomes:**
 
@@ -41,9 +41,9 @@ Arcidex is **ecosystem onboarding infrastructure** for the Arcium ecosystem:
 | Identify drop-off points | Lesson-version progress + funnel analytics (Phase 2+) |
 | Prepare developers before support | Progress + quiz pass signal before deep integration / support |
 
-**One-line thesis:** *Arcidex is ecosystem onboarding infrastructure—guided programs, comprehension checks, and measurable progress for new user onboarding and developer adoption across the Arcium ecosystem.*
+**One-line thesis:** *Arcademy is ecosystem onboarding infrastructure—guided programs, comprehension checks, and measurable progress for new user onboarding and developer adoption across the Arcium ecosystem.*
 
-### What Arcidex is not
+### What Arcademy is not
 
 | Not this | Why |
 |----------|-----|
@@ -52,7 +52,7 @@ Arcidex is **ecosystem onboarding infrastructure** for the Arcium ecosystem:
 | Partner CMS / marketing site builder | Lesson blocks are structured and constrained; partners don't own layout/CSS. |
 | Full gamification platform | v1 ships comprehension + progress integrity; streaks/badges/leaderboards/tokens are out of scope |
 | Analytics warehouse | v1 ships operational metrics and exports; not a BI product. |
-| White-label auth provider | Global Arcidex account; partner SSO is post-v1. |
+| White-label auth provider | Global Arcademy account; partner SSO is post-v1. |
 
 ### Preserved from original plan (still correct)
 
@@ -357,7 +357,7 @@ Staff Studio is the **evolution of `/staff/modules`**, not a parallel system.
 
 ### 6.2 Global account model
 
-- One Arcidex user across all programs.  
+- One Arcademy user across all programs.  
 - **Enrollment** created on explicit enroll or first authenticated lesson/quiz action (configurable per program; default: first action).  
 - Progress rows keyed by `lesson_version_id` under enrollment's pinned curriculum version.
 
@@ -368,7 +368,7 @@ Staff Studio is the **evolution of `/staff/modules`**, not a parallel system.
 | Step | Behavior |
 |------|----------|
 | Anonymous visitor opens first lesson | Full read access; quiz scored via guest API for **first lesson only** |
-| Guest storage key | `arcidex.guest.v2:{programId}:{lessonVersionId}` in localStorage |
+| Guest storage key | `arcademy.guest.v2:{programId}:{lessonVersionId}` in localStorage |
 | Guest payload | `{ quizAttempt, readAt, schemaVersion }` — no answer keys stored |
 | Sign up / sign in | `mergeGuestProgress(userId, guestPayload)` server action |
 | Merge rules | If user has no progress → import guest attempt. If user has progress → keep better score; never downgrade mastery. Emit `guest_progress_merged` event. |
@@ -396,7 +396,7 @@ Programs appear on hub only when **all** are true:
 
 ### 7.1 Design principle
 
-Arcidex optimizes for **credible onboarding outcomes** in technical ecosystems—not engagement mechanics that feel superficial. Partners and users should trust that progress means comprehension and readiness to use or integrate, not vanity metrics.
+Arcademy optimizes for **credible onboarding outcomes** in technical ecosystems—not engagement mechanics that feel superficial. Partners and users should trust that progress means comprehension and readiness to use or integrate, not vanity metrics.
 
 **v1 emphasis:**
 
@@ -448,13 +448,13 @@ Stored in `quiz_version.scoring_config` snapshot at publish.
 
 ### 7.5 Proof-of-learning (Phase 4+ direction)
 
-Arcidex aligns with **infrastructure identity**. After v1, evolve toward verifiable outcomes—not token incentives:
+Arcademy aligns with **infrastructure identity**. After v1, evolve toward verifiable outcomes—not token incentives:
 
 | Direction | Purpose |
 | --- | --- |
 | **Signed completion attestations** | Cryptographically signed proof a learner completed a specific program + curriculum version—verifiable by partners and tooling. |
 | **Ecosystem credentials** | Named credentials (e.g. "Arcium Fundamentals complete") for gating docs, support tiers, or beta access. |
-| **Portable progress records** | Learner-owned export of enrollment/completion history across Arcidex programs. |
+| **Portable progress records** | Learner-owned export of enrollment/completion history across Arcademy programs. |
 
 **Not in scope:** points-for-completion, token-gated rewards, NFT badges as primary model. Phase 0–1 `platform_event` + version FKs lay groundwork; attestations ship when legal/product gates clear.
 
@@ -620,7 +620,7 @@ org.trust_level_changed
 
 ### Keep
 
-- Single Arcidex hub and global learner account  
+- Single Arcademy hub and global learner account  
 - Hybrid authoring (staff default + manual trust gate)  
 - Arcium as Program #1  
 - Reading-first lesson UX and editorial design language  
@@ -706,7 +706,7 @@ Do not duplicate published lesson content in Notion.
 ## Appendix B — Suggested Notion page outline for partner
 
 1. Executive summary (§1)  
-2. What Arcidex is / is not (§2)  
+2. What Arcademy is / is not (§2)  
 3. Locked decisions table  
 4. Hub + program UX (wireframes TBD)  
 5. Partner journey (intake → staff build → trust → studio)  

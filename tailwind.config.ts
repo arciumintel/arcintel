@@ -1,7 +1,7 @@
 import type { Config } from "tailwindcss";
 
 /**
- * Arcidex palette — editorial paper + lapis ink accent.
+ * Arcademy palette — editorial paper + lapis ink accent.
  *
  * Rebuild of the former Stitch-violet palette around a warm-paper editorial
  * stack: cream canvas, true ink for text, lapis blue as the single saturated

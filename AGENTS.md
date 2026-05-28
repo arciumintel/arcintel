@@ -4,7 +4,7 @@ Repo-specific decisions and footguns. Short and current. Prune entries when they
 
 ## Start here
 
-Arcidex is **ecosystem onboarding infrastructure** for new user onboarding and developer adoption (not an education platform). Before routes, migrations, staff UI, or lesson/quiz work, read **`docs/AGENT-PLATFORM.md`**. Full engineering spec: `docs/superpowers/specs/2026-05-20-ecosystem-platform-design.md`. Human-readable overview: `docs/PLATFORM-OVERVIEW.md`.
+Arcademy is **ecosystem onboarding infrastructure** for new user onboarding and developer adoption (not an education platform). Before routes, migrations, staff UI, or lesson/quiz work, read **`docs/AGENT-PLATFORM.md`**. Full engineering spec: `docs/superpowers/specs/2026-05-20-ecosystem-platform-design.md`. Human-readable overview: `docs/PLATFORM-OVERVIEW.md`.
 
 **Phase order is strict:** Phase 0 (tenancy + database isolation) before public hub UI. Do not skip.
 
@@ -59,5 +59,5 @@ Launch program **Arcium** (`program.slug = arcium`) is seeded via migration/scri
 ## Other things
 
 - First launch program slug: **`arcium`**
-- Product name: **Arcidex**
+- Product name: **Arcademy**
 - Open engineering questions live in `docs/AGENT-PLATFORM.md` — resolve before implementing those areas
