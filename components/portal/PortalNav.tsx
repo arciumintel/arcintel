@@ -1,15 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useState } from "react";
 import {
   House,
   Library,
   CircleUser,
   LogIn,
+  LogOut,
   UserPlus,
   type LucideIcon,
 } from "lucide-react";
+import { authClient } from "@/lib/auth-client";
 import { useSpine } from "./SpineContext";
 
 interface NavEntry {
@@ -132,6 +135,84 @@ function NavLink({
   );
 }
 
+function NavSignOut({ collapsed }: { collapsed: boolean }) {
+  const router = useRouter();
+  const [pending, setPending] = useState(false);
+  const label = pending ? "Signing out…" : "Sign out";
+
+  async function handleSignOut() {
+    setPending(true);
+    await authClient.signOut();
+    setPending(false);
+    router.refresh();
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={() => void handleSignOut()}
+      disabled={pending}
+      aria-label={collapsed ? label : undefined}
+      title={collapsed ? label : undefined}
+      className={[
+        "group/navlink relative isolate block w-full font-sans text-[0.86rem] font-medium tracking-[-0.005em] text-ink-muted hover:text-accent disabled:cursor-not-allowed disabled:opacity-60",
+        collapsed ? "mx-auto h-10 w-10" : "mx-2 h-9 pl-5 pr-3 text-left",
+      ].join(" ")}
+      style={{
+        transition: `color 220ms ${EASE}, padding 320ms ${EASE}, margin 320ms ${EASE}, width 320ms ${EASE}, height 320ms ${EASE}`,
+      }}
+    >
+      <span
+        aria-hidden
+        className={[
+          "absolute -z-10 bg-paper-deep opacity-0 scale-95",
+          collapsed
+            ? "left-1/2 top-1/2 h-9 w-9 -translate-x-1/2 -translate-y-1/2 rounded-full"
+            : "inset-0 rounded-[2px]",
+          "group-hover/navlink:opacity-100 group-hover/navlink:scale-100",
+        ].join(" ")}
+        style={{
+          transition: `opacity 220ms ${EASE}, transform 320ms ${EASE}, background-color 220ms ${EASE}`,
+        }}
+      />
+      <span
+        className="flex h-full items-center transition-transform group-hover/navlink:translate-x-1"
+        style={{
+          opacity: collapsed ? 0 : 1,
+          transform: collapsed ? "translateX(-6px)" : "translateX(0)",
+          transition: `opacity 220ms ${EASE}, transform 280ms ${EASE}`,
+          pointerEvents: collapsed ? "none" : "auto",
+        }}
+      >
+        {label}
+      </span>
+      <span
+        aria-hidden
+        className="pointer-events-none absolute inset-0 flex items-center justify-center group-hover/navlink:scale-110"
+        style={{
+          opacity: collapsed ? 1 : 0,
+          transform: collapsed ? "scale(1)" : "scale(0.82)",
+          transition: `opacity 220ms ${EASE} 60ms, transform 320ms ${EASE}, color 220ms ${EASE}`,
+        }}
+      >
+        <LogOut size={18} strokeWidth={1.6} />
+      </span>
+      {collapsed ? (
+        <span
+          aria-hidden
+          className="pointer-events-none absolute left-full top-1/2 ml-4 -translate-y-1/2 -translate-x-1 whitespace-nowrap rounded-[2px] border border-ink bg-ink px-2.5 py-1 font-sans text-[0.72rem] font-medium text-paper-deep opacity-0 shadow-leaf group-hover/navlink:translate-x-0 group-hover/navlink:opacity-100"
+          style={{
+            transition: `opacity 200ms ${EASE} 80ms, transform 300ms ${EASE} 80ms`,
+            zIndex: 60,
+          }}
+        >
+          {label}
+        </span>
+      ) : null}
+    </button>
+  );
+}
+
 function SectionLabel({
   numeral,
   children,
@@ -169,6 +250,8 @@ function SectionLabel({
 
 export default function PortalNav() {
   const { collapsed, toggle } = useSpine();
+  const { data: session } = authClient.useSession();
+  const isSignedIn = Boolean(session?.user);
 
   return (
     <nav
@@ -217,24 +300,30 @@ export default function PortalNav() {
           {ACCOUNT.map((entry) => (
             <NavLink key={entry.href} entry={entry} collapsed={collapsed} />
           ))}
-          <NavLink
-            entry={{
-              href: "/login",
-              label: "Sign in",
-              Icon: LogIn,
-              match: (p) => p === "/login",
-            }}
-            collapsed={collapsed}
-          />
-          <NavLink
-            entry={{
-              href: "/register",
-              label: "Create account",
-              Icon: UserPlus,
-              match: (p) => p === "/register",
-            }}
-            collapsed={collapsed}
-          />
+          {isSignedIn ? (
+            <NavSignOut collapsed={collapsed} />
+          ) : (
+            <>
+              <NavLink
+                entry={{
+                  href: "/login",
+                  label: "Sign in",
+                  Icon: LogIn,
+                  match: (p) => p === "/login",
+                }}
+                collapsed={collapsed}
+              />
+              <NavLink
+                entry={{
+                  href: "/register",
+                  label: "Create account",
+                  Icon: UserPlus,
+                  match: (p) => p === "/register",
+                }}
+                collapsed={collapsed}
+              />
+            </>
+          )}
         </div>
       </div>
 

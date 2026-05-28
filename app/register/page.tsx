@@ -3,6 +3,8 @@ import AuthShell from "@/components/auth/AuthShell";
 import RegisterForm from "@/components/auth/RegisterForm";
 import { getEnabledSocialProviders } from "@/lib/auth-providers";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "Create account",
   description: "Create your Arcidex account to save progress across ecosystem programs.",

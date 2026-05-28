@@ -78,7 +78,12 @@ export default function RegisterForm({
           >
             Social
           </h2>
-          <SocialAuthButtons providers={socialProviders} callbackURL={callbackURL} />
+          <SocialAuthButtons
+            providers={socialProviders}
+            callbackURL={callbackURL}
+            errorCallbackURL="/register"
+            mode="sign-up"
+          />
         </section>
       ) : null}
 

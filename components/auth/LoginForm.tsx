@@ -13,9 +13,14 @@ const inputClass =
 type LoginFormProps = {
   socialProviders: SocialAuthProvider[];
   callbackURL?: string;
+  oauthError?: string | null;
 };
 
-export default function LoginForm({ socialProviders, callbackURL = "/account" }: LoginFormProps) {
+export default function LoginForm({
+  socialProviders,
+  callbackURL = "/account",
+  oauthError = null,
+}: LoginFormProps) {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -55,7 +60,17 @@ export default function LoginForm({ socialProviders, callbackURL = "/account" }:
           >
             Social
           </h2>
-          <SocialAuthButtons providers={socialProviders} callbackURL={callbackURL} />
+          <SocialAuthButtons
+            providers={socialProviders}
+            callbackURL={callbackURL}
+            errorCallbackURL="/login"
+            mode="sign-in"
+          />
+          {oauthError ? (
+            <p className="font-body text-[0.9rem] text-accent" role="alert">
+              {oauthError}
+            </p>
+          ) : null}
         </section>
       ) : null}
 

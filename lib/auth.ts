@@ -63,6 +63,15 @@ export const auth = betterAuth({
     requireEmailVerification: false,
   },
   socialProviders: buildSocialProviders(),
+  account: {
+    accountLinking: {
+      enabled: true,
+      // Same email on Google + GitHub → one Arcademy user (typical hub OAuth setup).
+      trustedProviders: ["google", "github"],
+      // Email/password users may have emailVerified false until we add verification mail.
+      requireLocalEmailVerified: false,
+    },
+  },
   user: {
     additionalFields: {
       username: {
