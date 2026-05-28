@@ -9,3 +9,5 @@ Partner-owned routes for the public learner experience:
 - `/account` learner account
 
 Phase 0 does not implement these pages. Use `lib/tenant/repositories/*` from Server Components — see [`docs/REPO-BOUNDARIES.md`](../../docs/REPO-BOUNDARIES.md).
+
+**Design and content rules for partner agents:** [`docs/FRONTEND-GUIDELINES.md`](../../docs/FRONTEND-GUIDELINES.md).

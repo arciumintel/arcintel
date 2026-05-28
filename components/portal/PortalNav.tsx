@@ -225,11 +225,21 @@ export default function PortalNav() {
             <NavLink key={entry.href} entry={entry} collapsed={collapsed} />
           ))}
           <NavLink
-            entry={{ href: "/login", label: "Sign in", Icon: LogIn, match: () => false }}
+            entry={{
+              href: "/login",
+              label: "Sign in",
+              Icon: LogIn,
+              match: (p) => p === "/login",
+            }}
             collapsed={collapsed}
           />
           <NavLink
-            entry={{ href: "/register", label: "Create account", Icon: UserPlus, match: () => false }}
+            entry={{
+              href: "/register",
+              label: "Create account",
+              Icon: UserPlus,
+              match: (p) => p === "/register",
+            }}
             collapsed={collapsed}
           />
         </div>
