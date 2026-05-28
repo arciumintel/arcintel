@@ -28,7 +28,7 @@ function ShellInner({ children }: { children: ReactNode }) {
       >
         <style>{`
           @media (min-width: 768px) {
-            [data-portal-layout] { --spine-ml: ${collapsed ? "56px" : "280px"}; }
+            [data-portal-layout] { --spine-ml: ${collapsed ? "56px" : "260px"}; }
           }
         `}</style>
 
