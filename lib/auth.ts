@@ -54,7 +54,7 @@ function buildSocialProviders() {
 }
 
 export const auth = betterAuth({
-  appName: "Arcidex",
+  appName: "Arcademy",
   baseURL: getBaseUrl(),
   secret: authSecret,
   database: db,

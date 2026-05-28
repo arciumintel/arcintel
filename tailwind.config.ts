@@ -1,7 +1,7 @@
 import type { Config } from "tailwindcss";
 
 /**
- * Arcidex palette — editorial paper + lapis ink accent.
+ * Arcademy palette — editorial paper + lapis ink accent.
  *
  * Rebuild of the former Stitch-violet palette around a warm-paper editorial
  * stack: cream canvas, true ink for text, lapis blue as the single saturated
@@ -137,36 +137,33 @@ const config: Config = {
         lg: "24px",
       },
       fontFamily: {
-        // Display & editorial italic — Fraunces (variable, opsz + SOFT).
-        masthead: ["var(--font-fraunces)", "Georgia", "serif"],
-        display: ["var(--font-fraunces)", "Georgia", "serif"],
-        h1: ["var(--font-fraunces)", "Georgia", "serif"],
-        "h1-mobile": ["var(--font-fraunces)", "Georgia", "serif"],
-        h2: ["var(--font-fraunces)", "Georgia", "serif"],
-        h3: ["var(--font-fraunces)", "Georgia", "serif"],
-        // Body — Source Serif 4 (variable, opsz).
-        body: ["var(--font-source-serif)", "Georgia", "serif"],
-        "body-md": ["var(--font-source-serif)", "Georgia", "serif"],
-        "body-sm": ["var(--font-source-serif)", "Georgia", "serif"],
-        // UI auxiliaries — Inter, for nav items, buttons, kbd hints.
-        ui: ["var(--font-inter)", "system-ui", "sans-serif"],
-        // Apparatus — JetBrains Mono, for kicker/eyebrow labels, folios, code.
-        mono: ["var(--font-jetbrains)", "ui-monospace", "monospace"],
-        label: ["var(--font-jetbrains)", "ui-monospace", "monospace"],
-        "label-caps": ["var(--font-jetbrains)", "ui-monospace", "monospace"],
-        headline: ["var(--font-fraunces)", "Georgia", "serif"],
+        sans: ["var(--font-geist-sans)", "ui-sans-serif", "system-ui", "sans-serif"],
+        masthead: ["var(--font-geist-sans)", "system-ui", "sans-serif"],
+        display: ["var(--font-geist-sans)", "system-ui", "sans-serif"],
+        h1: ["var(--font-geist-sans)", "system-ui", "sans-serif"],
+        "h1-mobile": ["var(--font-geist-sans)", "system-ui", "sans-serif"],
+        h2: ["var(--font-geist-sans)", "system-ui", "sans-serif"],
+        h3: ["var(--font-geist-sans)", "system-ui", "sans-serif"],
+        body: ["var(--font-geist-sans)", "system-ui", "sans-serif"],
+        "body-md": ["var(--font-geist-sans)", "system-ui", "sans-serif"],
+        "body-sm": ["var(--font-geist-sans)", "system-ui", "sans-serif"],
+        ui: ["var(--font-geist-sans)", "system-ui", "sans-serif"],
+        headline: ["var(--font-geist-sans)", "system-ui", "sans-serif"],
+        mono: ["var(--font-geist-mono)", "ui-monospace", "monospace"],
+        label: ["var(--font-geist-mono)", "ui-monospace", "monospace"],
+        "label-caps": ["var(--font-geist-mono)", "ui-monospace", "monospace"],
       },
       fontSize: {
         "label-caps": [
           "0.7rem",
-          { letterSpacing: "0.18em", fontWeight: "500", lineHeight: "1.4" },
+          { letterSpacing: "0.14em", fontWeight: "500", lineHeight: "1.4" },
         ],
-        "body-md": ["1.05rem", { lineHeight: "1.72", fontWeight: "400" }],
-        "body-sm": ["0.92rem", { lineHeight: "1.65", fontWeight: "400" }],
-        "h1-mobile": ["2.6rem", { lineHeight: "1.0", fontWeight: "300", letterSpacing: "-0.03em" }],
-        h1: ["4.4rem", { lineHeight: "0.98", fontWeight: "300", letterSpacing: "-0.035em" }],
-        h2: ["2rem", { lineHeight: "1.2", fontWeight: "400", letterSpacing: "-0.02em" }],
-        h3: ["1.5rem", { lineHeight: "1.3", fontWeight: "400", letterSpacing: "-0.015em" }],
+        "body-md": ["1.02rem", { lineHeight: "1.62", fontWeight: "400" }],
+        "body-sm": ["0.9rem", { lineHeight: "1.55", fontWeight: "400" }],
+        "h1-mobile": ["2.6rem", { lineHeight: "0.96", fontWeight: "700", letterSpacing: "-0.04em" }],
+        h1: ["4.4rem", { lineHeight: "0.94", fontWeight: "700", letterSpacing: "-0.04em" }],
+        h2: ["2.4rem", { lineHeight: "1.04", fontWeight: "600", letterSpacing: "-0.03em" }],
+        h3: ["1.55rem", { lineHeight: "1.18", fontWeight: "600", letterSpacing: "-0.02em" }],
       },
       maxWidth: {
         prose: "65ch",

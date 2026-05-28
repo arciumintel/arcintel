@@ -3,12 +3,9 @@
 @tailwind utilities;
 
 /* ──────────────────────────────────────────────────────────────────
-   Motion system
-   ──────────────────────────────────────────────────────────────────
-   One easing curve everywhere — easeOutExpo (Apple's preferred). One
-   duration scale: 160 (snap), 220 (default), 320 (handover), 480 (slow
-   fold). Custom properties below let any component pick from the set
-   without redeclaring the curve.
+   Motion system — single curve, named durations. easeOutExpo for the
+   "tactile" feel; easeOutBack for snappier returns. Both clamped under
+   prefers-reduced-motion.
 */
 :root {
   --ease-out-expo: cubic-bezier(0.22, 1, 0.36, 1);
@@ -18,6 +15,10 @@
   --d-handover: 320ms;
   --d-fold: 480ms;
   --accent-c: #C5462E;
+  --ink-c: #1A1814;
+  --ink-soft-c: #8C8473;
+  --ink-faint-c: #B5AC97;
+  --bg-c: #F4F0E6;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -30,106 +31,20 @@
 }
 
 @layer base {
-  /* Paper canvas + grain layer live on html so body ::before/::after can sit
-     at z-index: -1 above the canvas without covering in-flow UI. */
   html {
     min-height: 100%;
     background-color: theme("colors.background");
   }
 
-  /* ── Editorial surface ─────────────────────────────────────────────
-     The default body styling for Arcidex: warm paper, ink text, variable
-     serif body with old-style figures and discretionary ligatures enabled.
-     Paper grain is a fixed multiply layer activated after first paint.
-  */
   body {
-    @apply font-body text-ink antialiased selection:bg-accent-soft selection:text-ink;
+    @apply font-sans text-ink antialiased selection:bg-accent-soft selection:text-ink;
     background-color: theme("colors.background");
-    font-feature-settings: "onum", "kern", "liga", "dlig";
-    font-variant-numeric: oldstyle-nums proportional-nums;
-    --paper-grain-opacity: 0.10;
-    --crop-mark-opacity: 0.32;
+    font-feature-settings: "kern", "liga", "calt", "ss01", "ss02";
   }
 
-  @media (prefers-contrast: more), (prefers-reduced-motion: reduce) {
-    body {
-      --paper-grain-opacity: 0.05;
-      --crop-mark-opacity: 0.16;
-    }
-  }
-
-  /* Paper grain — fractal noise via SVG data URI, multiply blend. */
-  body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    pointer-events: none;
-    opacity: var(--paper-grain-opacity);
-    mix-blend-mode: multiply;
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.10 0 0 0 0 0.09 0 0 0 0 0.07 0 0 0 0.06 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
-  }
-
-  /* Crop marks — ochre L-shaped registration marks at the four page corners. */
-  body::after {
-    content: "";
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    pointer-events: none;
-    opacity: var(--crop-mark-opacity);
-    background-image:
-      linear-gradient(theme("colors.ochre"), theme("colors.ochre")),
-      linear-gradient(theme("colors.ochre"), theme("colors.ochre")),
-      linear-gradient(theme("colors.ochre"), theme("colors.ochre")),
-      linear-gradient(theme("colors.ochre"), theme("colors.ochre")),
-      linear-gradient(theme("colors.ochre"), theme("colors.ochre")),
-      linear-gradient(theme("colors.ochre"), theme("colors.ochre")),
-      linear-gradient(theme("colors.ochre"), theme("colors.ochre")),
-      linear-gradient(theme("colors.ochre"), theme("colors.ochre"));
-    background-size:
-      1px 12px, 12px 1px,
-      1px 12px, 12px 1px,
-      1px 12px, 12px 1px,
-      1px 12px, 12px 1px;
-    background-position:
-      left 14px top 14px,
-      left 14px top 14px,
-      right 14px top 14px,
-      right 14px top 14px,
-      left 14px bottom 14px,
-      left 14px bottom 14px,
-      right 14px bottom 14px,
-      right 14px bottom 14px;
-    background-repeat: no-repeat;
-  }
-
-  /* ── Headlines ────────────────────────────────────────────────────
-     Fraunces (display, italic, SOFT axis) for h1/h2/h3 with optical-size
-     variation. Body weight stays light at large sizes — never bold.
-  */
-  h1 {
-    @apply font-masthead text-ink;
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-sans text-ink;
     text-wrap: balance;
-    font-variation-settings: "opsz" 144, "SOFT" 30;
-  }
-
-  h2 {
-    @apply font-display text-ink;
-    text-wrap: balance;
-    font-variation-settings: "opsz" 144, "SOFT" 40;
-  }
-
-  h3 {
-    @apply font-display text-ink;
-    text-wrap: balance;
-    font-variation-settings: "opsz" 144, "SOFT" 50;
-  }
-
-  h4, h5, h6 {
-    @apply font-display text-ink;
-    font-weight: 400;
-    font-variation-settings: "opsz" 60, "SOFT" 50;
   }
 
   p {
@@ -141,179 +56,6 @@
   }
 }
 
-/* ──────────────────────────────────────────────────────────────────
-   Editorial primitives
-   ────────────────────────────────────────────────────────────────── */
-
-/* Hairline rules — weight variants for masthead, double, hair. */
-.editorial-rule {
-  display: block;
-  width: 100%;
-  height: 0;
-  margin: 0;
-  padding: 0;
-  border: none;
-  border-top: 1px solid theme("colors.rule");
-  background: none;
-}
-
-.editorial-rule--hair,
-.editorial-rule[data-rule-weight="hair"] {
-  border-top-width: 0.5px;
-  border-top-color: theme("colors.ochre");
-}
-
-.editorial-rule--double,
-.editorial-rule[data-rule-weight="double"] {
-  border-top: 3px double theme("colors.rule-strong");
-}
-
-.editorial-rule--masthead,
-.editorial-rule[data-rule-weight="masthead"] {
-  border-top: 1px solid theme("colors.ink");
-}
-
-/* Eyebrow / kicker — monospace small-caps annotation. */
-.eyebrow {
-  font-family: var(--font-jetbrains), ui-monospace, monospace;
-  font-size: 0.68rem;
-  font-weight: 500;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: theme("colors.ink-soft");
-}
-
-/* Folio + stat numerals: tabular alignment. */
-.folio,
-.stat,
-table,
-.tabular-nums {
-  font-variant-numeric: tabular-nums;
-}
-
-/* Folio — italic Fraunces in the margin. */
-.folio {
-  font-family: var(--font-fraunces), Georgia, serif;
-  font-style: italic;
-  font-size: 0.85rem;
-  color: theme("colors.ink-soft");
-  font-variation-settings: "opsz" 144;
-}
-
-/* Drop cap — Fraunces 200 italic in lapis, first paragraph of an article. */
-.drop-cap::first-letter {
-  font-family: var(--font-fraunces), Georgia, serif;
-  font-weight: 200;
-  font-style: italic;
-  font-size: 5.2rem;
-  line-height: 0.78;
-  float: left;
-  padding: 0.32rem 0.65rem 0 0;
-  color: theme("colors.accent");
-  font-variation-settings: "opsz" 144, "SOFT" 60;
-}
-
-/* Pull-quote — display italic with lapis smart quotes, bounded by hairlines. */
-.pull-quote {
-  margin: 3.5rem 0;
-  padding: 2.2rem 0;
-  border-top: 1px solid theme("colors.ink");
-  border-bottom: 1px solid theme("colors.ink");
-  font-family: var(--font-fraunces), Georgia, serif;
-  font-style: italic;
-  font-weight: 200;
-  font-size: clamp(1.5rem, 2.4vw, 2rem);
-  line-height: 1.3;
-  letter-spacing: -0.018em;
-  color: theme("colors.ink");
-  font-variation-settings: "opsz" 144, "SOFT" 60;
-  text-indent: -0.45em;
-  text-wrap: balance;
-}
-.pull-quote::before { content: "\201C"; color: theme("colors.accent"); }
-.pull-quote::after { content: "\201D"; color: theme("colors.accent"); }
-
-/* Reading column — book measure. */
-.reading-column {
-  max-width: 38rem;
-}
-@media (min-width: 1280px) {
-  .reading-column {
-    max-width: 42rem;
-  }
-}
-
-/* Margin note — Tufte-style gutter annotation with ochre rule and ⊕ glyph. */
-.margin-note {
-  font-family: var(--font-ui), Inter, sans-serif;
-  font-size: 0.82rem;
-  line-height: 1.5;
-  color: theme("colors.ink-soft");
-  padding-left: 1rem;
-  border-left: 1px solid theme("colors.ochre");
-}
-
-/* Section ornament — varied glyphs between sections. */
-.section-break {
-  text-align: center;
-  margin: 3.5rem 0;
-  color: theme("colors.ink-soft");
-  font-family: var(--font-fraunces), Georgia, serif;
-  font-size: 1.2rem;
-  letter-spacing: 0.5em;
-  font-variation-settings: "opsz" 144;
-}
-
-/* Numbered section marker — № i. ──── eyebrow */
-.section-marker {
-  display: flex;
-  align-items: center;
-  gap: 0.95rem;
-  margin-bottom: 2rem;
-}
-.section-marker .num {
-  font-family: var(--font-fraunces), Georgia, serif;
-  font-style: italic;
-  font-size: 1rem;
-  color: theme("colors.accent");
-  font-variation-settings: "opsz" 144;
-  flex-shrink: 0;
-}
-.section-marker .rule {
-  flex: 1;
-  height: 1px;
-  background: theme("colors.rule");
-}
-
-/* Code block — paper-shade background, monospace, line numbers. */
-.code-block {
-  margin: 2rem 0;
-  background: theme("colors.paper-shade");
-  border: 1px solid theme("colors.rule");
-  border-radius: 2px;
-}
-.code-block header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.45rem 1rem;
-  font-family: var(--font-jetbrains), ui-monospace, monospace;
-  font-size: 0.65rem;
-  letter-spacing: 0.08em;
-  color: theme("colors.ink-soft");
-  border-bottom: 1px solid theme("colors.rule");
-}
-.code-block pre {
-  margin: 0;
-  padding: 1rem;
-  overflow-x: auto;
-  font-family: var(--font-jetbrains), ui-monospace, monospace;
-  font-size: 0.83rem;
-  line-height: 1.65;
-  color: theme("colors.ink");
-}
-
-/* Accessibility / focus */
 @layer base {
   *:focus { outline: none; }
   :where(a, button, input, textarea, select, [tabindex]):focus-visible {
@@ -351,67 +93,23 @@ table,
     transform: scale(0.98) translateY(1px);
   }
 
-  /* Editorial list rows — used by curriculum, reference, glossary lists. */
-  .row-editorial {
-    transition:
-      padding-left var(--d-handover) var(--ease-out-expo),
-      background-color var(--d-default) var(--ease-out-expo),
-      color var(--d-default) var(--ease-out-expo);
-  }
-  .row-editorial:hover {
-    padding-left: 0.75rem;
-  }
-
-  /* Inline link affordance — subtle ink-to-accent on hover. */
-  .link-editorial {
-    color: theme("colors.ink");
-    border-bottom: 1px solid theme("colors.rule");
-    transition:
-      color var(--d-default) var(--ease-out-expo),
-      border-color var(--d-default) var(--ease-out-expo);
-  }
-  .link-editorial:hover {
-    color: theme("colors.accent");
-    border-bottom-color: theme("colors.accent");
-  }
-
-  /* Page enter — first paint fade+rise. Replays on every route mount
-     because PortalShell keys its wrapper by `pathname`, so React unmounts
-     and remounts this node on navigation. */
+  /* Page enter — fade + rise. Replays via key={pathname}. */
   @keyframes pageEnter {
-    0% {
-      opacity: 0;
-      transform: translateY(14px) scale(0.992);
-      filter: blur(3px);
-    }
-    60% {
-      filter: blur(0);
-    }
-    100% {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-      filter: blur(0);
-    }
+    0% { opacity: 0; transform: translateY(14px) scale(0.992); filter: blur(3px); }
+    60% { filter: blur(0); }
+    100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
   }
   .page-enter {
     animation: pageEnter 560ms var(--ease-out-expo) both;
     will-change: opacity, transform, filter;
   }
 
-  /* Stagger helper — apply to children of a container to fan them in. */
+  /* Stagger helper — children fade in sequentially. */
   @keyframes itemStagger {
-    from {
-      opacity: 0;
-      transform: translateY(6px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
   }
-  .stagger > * {
-    animation: itemStagger 540ms var(--ease-out-expo) both;
-  }
+  .stagger > * { animation: itemStagger 540ms var(--ease-out-expo) both; }
   .stagger > *:nth-child(1) { animation-delay: 40ms; }
   .stagger > *:nth-child(2) { animation-delay: 110ms; }
   .stagger > *:nth-child(3) { animation-delay: 180ms; }
@@ -422,10 +120,7 @@ table,
   .stagger > *:nth-child(8) { animation-delay: 530ms; }
 
   @media (prefers-reduced-motion: reduce) {
-    .page-enter,
-    .stagger > * {
-      animation: none;
-    }
+    .page-enter, .stagger > * { animation: none; }
   }
 }
 
@@ -433,85 +128,28 @@ table,
   @apply sr-only;
 }
 .skip-to-content:focus {
-  @apply not-sr-only fixed left-3 top-3 z-[200] inline-flex items-center bg-ink px-4 py-2 font-body text-sm font-semibold text-paper shadow-leaf;
+  @apply not-sr-only fixed left-3 top-3 z-[200] inline-flex items-center bg-ink px-4 py-2 font-sans text-sm font-semibold text-paper shadow-leaf;
 }
-
-/* ──────────────────────────────────────────────────────────────────
-   Retained class hooks (kept as no-ops so older surfaces still compile).
-   ────────────────────────────────────────────────────────────────── */
-
-.console-window {
-  @apply bg-paper-soft transition-colors duration-300;
-}
-.console-header {
-  @apply flex items-center justify-between gap-3 border-b border-rule px-5 py-2.5 font-mono text-[11px] uppercase tracking-[0.14em] text-ink-soft;
-}
-.console-header > span:last-child {
-  @apply text-accent;
-}
-.scanline-effect { display: none; }
-.glitch-hover:hover { text-shadow: none; }
-.academy-flow {
-  background-color: theme('colors.paper');
-  background-image:
-    radial-gradient(circle at 18% 22%, rgba(30, 58, 95, 0.04), transparent 36%),
-    radial-gradient(circle at 80% 78%, rgba(164, 126, 43, 0.05), transparent 36%);
-}
-.academy-preview-mask {
-  background:
-    linear-gradient(180deg, rgba(244, 240, 230, 0) 0%, rgba(244, 240, 230, 0.92) 88%, rgba(244, 240, 230, 1) 100%);
-}
-.academy-search-results::-webkit-scrollbar { width: 8px; }
-.academy-search-results::-webkit-scrollbar-thumb {
-  background: theme('colors.rule-strong');
-  border-radius: 999px;
-}
-.region-group { pointer-events: none; }
-.animated-flow-primary path,
-.animated-flow-primary line { stroke-dasharray: 6 6; }
-.animated-flow-secondary path { stroke-dasharray: 4 6; }
-
-.scrollbar-none {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-.scrollbar-none::-webkit-scrollbar { display: none; }
 
 @layer utilities {
-  .material-symbols-outlined {
-    font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
-  }
   .hide-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
   .hide-scrollbar::-webkit-scrollbar { display: none; }
+
+  /* Numerals: tabular for tables, lining for stats, oldstyle off everywhere. */
+  .num-tabular { font-variant-numeric: tabular-nums; }
+  .num-lining { font-variant-numeric: lining-nums; }
+
+  /* Stencil text-shadow effect for huge bold display. */
+  .text-stroke {
+    -webkit-text-stroke: 1px theme("colors.ink");
+    color: transparent;
+  }
 }
 
-/* Headline underline sweep (kept for compatibility, retinted to ink). */
-@keyframes headlineUnderline {
-  from { transform: scaleX(0); }
-  to { transform: scaleX(1); }
-}
-.headline-underline-sweep {
-  transform: scaleX(0);
-  transform-origin: left center;
-}
-@media (prefers-reduced-motion: no-preference) {
-  .headline-underline-sweep {
-    animation: headlineUnderline 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.25s forwards;
-  }
-}
+/* Reduced-motion: kill the page-enter animation. */
 @media (prefers-reduced-motion: reduce) {
-  .headline-underline-sweep { transform: scaleX(1); }
-  .constellation-node-active { animation: none; }
-}
-@keyframes constellationPulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.7; }
-}
-@media (prefers-reduced-motion: no-preference) {
-  .constellation-node-active {
-    animation: constellationPulse 2.2s ease-in-out infinite;
-  }
+  .page-enter { animation: none; }
 }

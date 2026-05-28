@@ -10,10 +10,10 @@ interface SpineContextValue {
 
 const SpineContext = createContext<SpineContextValue | null>(null);
 
-const STORAGE_KEY = "arcidex.spine.collapsed";
+const STORAGE_KEY = "arcademy.spine.collapsed";
 
 /**
- * The "spine" is Arcidex's editorial sidebar. It can collapse to a thin
+ * The "spine" is Arcademy's editorial sidebar. It can collapse to a thin
  * vertical strip (56px) to give the reading column more room. State is
  * persisted to localStorage so a reader's preferred mode survives page
  * navigation; first paint defaults to expanded.

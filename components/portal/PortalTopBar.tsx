@@ -14,7 +14,6 @@ function deriveTitle(pathname: string): string {
   if (TITLE_MAP[pathname] !== undefined) return TITLE_MAP[pathname];
   if (pathname.startsWith("/programs/")) {
     const segs = pathname.split("/").filter(Boolean);
-    // /programs/[slug] or /programs/[slug]/lessons/[lessonSlug]
     if (segs.length >= 4 && segs[2] === "lessons") {
       return `${capitalize(segs[1] ?? "")} · ${capitalize(segs[3] ?? "")}`;
     }
@@ -38,19 +37,19 @@ export default function PortalTopBar() {
       style={{ transition: `box-shadow 280ms ${EASE}` }}
     >
       <div
-        className="flex w-full items-baseline justify-between gap-6"
+        className="flex w-full items-center justify-between gap-6"
         style={{
-          paddingLeft: "clamp(20px, 4vw, 64px)",
-          paddingRight: "clamp(20px, 4vw, 64px)",
-          paddingTop: "1.1rem",
-          paddingBottom: "0.6rem",
+          paddingLeft: "clamp(20px, 4vw, 56px)",
+          paddingRight: "clamp(20px, 4vw, 56px)",
+          paddingTop: "1rem",
+          paddingBottom: "0.7rem",
         }}
       >
-        <div className="flex min-w-0 flex-1 items-baseline gap-4">
+        <div className="flex min-w-0 flex-1 items-center gap-4">
           {!isHome ? (
-            <span className="hidden font-mono text-[0.6rem] uppercase tracking-[0.22em] text-ink-soft md:inline">
-              Arcidex
-              <span aria-hidden className="mx-2 text-ink-faint">·</span>
+            <span className="hidden font-mono text-[0.6rem] uppercase tracking-[0.18em] text-ink-soft md:inline">
+              Arcademy
+              <span aria-hidden className="mx-2 text-ink-faint">/</span>
             </span>
           ) : null}
 
@@ -58,12 +57,11 @@ export default function PortalTopBar() {
             <span className="sr-only">Hub</span>
           ) : (
             <h1
-              className="m-0 min-w-0 truncate font-display italic text-ink"
+              className="m-0 min-w-0 truncate font-sans text-ink"
               style={{
-                fontWeight: 400,
-                fontSize: "1.35rem",
-                letterSpacing: "-0.012em",
-                fontVariationSettings: "'opsz' 144, 'SOFT' 50",
+                fontWeight: 600,
+                fontSize: "1.2rem",
+                letterSpacing: "-0.02em",
               }}
             >
               {title}
@@ -71,7 +69,7 @@ export default function PortalTopBar() {
           )}
         </div>
       </div>
-      <span aria-hidden className="block h-px w-full bg-rule" />
+      <span aria-hidden className="block h-px w-full bg-ink/10" />
     </header>
   );
 }

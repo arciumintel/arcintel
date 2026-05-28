@@ -1,8 +1,8 @@
-# Agent context: Arcidex platform
+# Agent context: Arcademy platform
 
 **Read this before scaffolding, migrations, routes, or any feature that touches programs, lessons, partners, or the hub.**
 
-Arcidex is **greenfield** **ecosystem onboarding infrastructure** for the Arcium ecosystem—not an education platform or generic LMS. Each partner runs a **Program** (structured lessons + comprehension quizzes) under one curated hub. **Arcium Fundamentals** ships as **Program #1** at launch — seeded like any other program, not as a special code path.
+Arcademy is **greenfield** **ecosystem onboarding infrastructure** for the Arcium ecosystem—not an education platform or generic LMS. Each partner runs a **Program** (structured lessons + comprehension quizzes) under one curated hub. **Arcium Fundamentals** ships as **Program #1** at launch — seeded like any other program, not as a special code path.
 
 When this file and the full design spec disagree, **follow the spec** unless the user explicitly changes direction.
 
@@ -10,13 +10,13 @@ When this file and the full design spec disagree, **follow the spec** unless the
 
 ## One-line thesis
 
-Arcidex is ecosystem onboarding infrastructure: guided programs, comprehension checks, and measurable progress for new user onboarding and developer adoption across the Arcium ecosystem. Internally, the platform owns structure, versioning, tenant isolation, and progress integrity; users get a single account and a curated hub.
+Arcademy is ecosystem onboarding infrastructure: guided programs, comprehension checks, and measurable progress for new user onboarding and developer adoption across the Arcium ecosystem. Internally, the platform owns structure, versioning, tenant isolation, and progress integrity; users get one account and a curated hub.
 
 **Partner outcomes (product north star):** reduce onboarding friction, improve activation, standardize onboarding, identify drop-off points, prepare developers before support requests.
 
 ---
 
-## What Arcidex is / is not
+## What Arcademy is / is not
 
 **Is:** Ecosystem onboarding infrastructure — hub discovery, program-scoped curricula, block-structured lessons, platform-defined quizzes with partner guardrails, staff-governed publishing, event-backed progress, reading-first lesson UX.
 
@@ -32,7 +32,7 @@ Scope test: *Does this help an ecosystem team onboard new users—including deve
 | --- | --- |
 | **Hub** | Single catalog: `/` → `/programs` → `/programs/[slug]` → lessons |
 | **Launch content** | Arcium = first program (`program.slug = arcium`); seed via migrations/scripts |
-| **Learner accounts** | Global Arcidex account; per-program enrollment + progress |
+| **Learner accounts** | Global Arcademy account; per-program enrollment + progress |
 | **Authoring default** | Staff-built; new partners start **untrusted** (intake only) |
 | **Partner self-serve** | Manual trust gate → draft-only Partner Studio (Phase 3); **staff publish only in v1** |
 | **Partner quizzes** | Trusted partners author quizzes in draft using **platform question types** and configurable guardrails — not custom schemas |
@@ -223,7 +223,7 @@ Text fields: `{ "en": "..." }` (only `en` required in v1). New block types ship 
 - Validate blocks and quiz JSON at **author time** and **publish time**.
 - Copy-on-publish for all versioned content.
 - Emit `platform_event` learner events in the **same transaction** as progress writes (Phase 1+).
-- Guest storage key (Phase 1): `arcidex.guest.v2:{programId}:{lessonVersionId}`.
+- Guest storage key (Phase 1): `arcademy.guest.v2:{programId}:{lessonVersionId}`.
 - Log tenant context resolution failures; alert on RLS policy violations.
 - Audit staff cross-org access.
 
@@ -302,7 +302,7 @@ Record answers here when decided.
 
 ## Branding
 
-- Product: **Arcidex**
+- Product: **Arcademy**
 - First launch program slug: **`arcium`**
 
 ---

@@ -1,52 +1,22 @@
 import type { Metadata } from "next";
-import { Fraunces, Source_Serif_4, JetBrains_Mono, Inter } from "next/font/google";
+import { GeistSans } from "geist/font/sans";
+import { GeistMono } from "geist/font/mono";
 import PortalShell from "@/components/portal/PortalShell";
 import "./globals.css";
 
-const fraunces = Fraunces({
-  subsets: ["latin"],
-  variable: "--font-fraunces",
-  style: ["normal", "italic"],
-  axes: ["SOFT", "opsz"],
-  display: "swap",
-});
-
-const sourceSerif = Source_Serif_4({
-  subsets: ["latin"],
-  variable: "--font-source-serif",
-  style: ["normal", "italic"],
-  axes: ["opsz"],
-  display: "swap",
-});
-
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-  weight: ["400", "500", "600"],
-  display: "swap",
-});
-
-const jetbrains = JetBrains_Mono({
-  subsets: ["latin"],
-  variable: "--font-jetbrains",
-  weight: ["400", "500", "600"],
-  display: "swap",
-});
-
 export const metadata: Metadata = {
   title: {
-    default: "Arcidex — Ecosystem onboarding for Arcium",
-    template: "%s | Arcidex",
+    default: "Arcademy — Ecosystem onboarding for Arcium",
+    template: "%s | Arcademy",
   },
   description:
-    "Arcidex is the shared learning checkpoint for the Arcium ecosystem. Partner apps verify user comprehension; learners get one account and a curated catalog of programs.",
-  keywords: ["Arcidex", "Arcium", "onboarding", "ecosystem", "learning", "MXE", "confidential compute"],
+    "Arcademy is the shared learning checkpoint for the Arcium ecosystem. Partner apps verify user comprehension; learners get one account and a curated catalog of programs.",
+  keywords: ["Arcademy", "Arcium", "onboarding", "ecosystem", "learning", "MXE", "confidential compute"],
   openGraph: {
-    siteName: "Arcidex",
+    siteName: "Arcademy",
     type: "website",
-    title: "Arcidex — Ecosystem onboarding for Arcium",
-    description:
-      "The shared learning checkpoint for the Arcium ecosystem.",
+    title: "Arcademy — Ecosystem onboarding for Arcium",
+    description: "The shared learning checkpoint for the Arcium ecosystem.",
   },
 };
 
@@ -58,9 +28,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`scroll-smooth ${fraunces.variable} ${sourceSerif.variable} ${inter.variable} ${jetbrains.variable}`}
+      className={`scroll-smooth ${GeistSans.variable} ${GeistMono.variable}`}
     >
-      <body className="min-h-screen bg-background font-body text-ink antialiased selection:bg-accent-soft selection:text-ink">
+      <body className="min-h-screen bg-background font-sans text-ink antialiased selection:bg-accent-soft selection:text-ink">
         <PortalShell>{children}</PortalShell>
       </body>
     </html>
