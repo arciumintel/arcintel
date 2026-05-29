@@ -27,10 +27,7 @@ export default async function StaffProgramCurriculumPage({ params }: PageProps) 
     throw error;
   }
 
-  const lessons =
-    overview.lessonCount > 0
-      ? await listWorkspaceLessons(ctx, { orgSlug, programSlug })
-      : [];
+  const lessons = await listWorkspaceLessons(ctx, { orgSlug, programSlug });
 
   const base = `/staff/organizations/${orgSlug}/programs/${programSlug}`;
 

@@ -102,39 +102,18 @@ async function getProgramRow(
   return row;
 }
 
-async function countWorkspaceLessons(
+async function findWorkspaceVersionId(
   client: PoolClient,
   curriculumId: string,
   activePublishedVersionId: string | null,
-): Promise<number> {
-  const { rows } = await client.query<{ count: string }>(
-    `select count(lv.id)::text as count
-     from curriculum_version cv
-     join track t on t.curriculum_version_id = cv.id
-     join lesson_version lv on lv.track_id = t.id
-     where cv.curriculum_id = $1
-       and (
-         $2::uuid is null
-         or cv.id is distinct from $2::uuid
-       )`,
-    [curriculumId, activePublishedVersionId],
-  );
-
-  return Number(rows[0]?.count ?? 0);
-}
-
-async function getOrCreateWorkspaceVersionId(
-  client: PoolClient,
-  curriculumId: string,
-  activePublishedVersionId: string | null,
-): Promise<string> {
+): Promise<string | null> {
   const { rows } = await client.query<{ id: string }>(
     `select id
      from curriculum_version
      where curriculum_id = $1
        and (
-         $2::uuid is null
-         or id is distinct from $2::uuid
+         $2::uuid is not null
+         and id is distinct from $2::uuid
        )
      order by version_number desc
      limit 1`,
@@ -145,11 +124,75 @@ async function getOrCreateWorkspaceVersionId(
     return rows[0].id;
   }
 
+  if (activePublishedVersionId !== null) {
+    return null;
+  }
+
+  const { rows: latestRows } = await client.query<{ id: string }>(
+    `select id
+     from curriculum_version
+     where curriculum_id = $1
+     order by version_number desc
+     limit 1`,
+    [curriculumId],
+  );
+
+  return latestRows[0]?.id ?? null;
+}
+
+async function countWorkspaceLessons(
+  client: PoolClient,
+  curriculumId: string,
+  activePublishedVersionId: string | null,
+): Promise<number> {
+  const workspaceVersionId = await findWorkspaceVersionId(
+    client,
+    curriculumId,
+    activePublishedVersionId,
+  );
+
+  if (!workspaceVersionId) {
+    return 0;
+  }
+
+  const { rows } = await client.query<{ count: string }>(
+    `select count(lv.id)::text as count
+     from track t
+     join lesson_version lv on lv.track_id = t.id
+     where t.curriculum_version_id = $1`,
+    [workspaceVersionId],
+  );
+
+  return Number(rows[0]?.count ?? 0);
+}
+
+async function getOrCreateWorkspaceVersionId(
+  client: PoolClient,
+  curriculumId: string,
+  activePublishedVersionId: string | null,
+): Promise<string> {
+  const existing = await findWorkspaceVersionId(
+    client,
+    curriculumId,
+    activePublishedVersionId,
+  );
+
+  if (existing) {
+    return existing;
+  }
+
+  const { rows: nextRows } = await client.query<{ next_version: string }>(
+    `select coalesce(max(version_number), 0) + 1 as next_version
+     from curriculum_version
+     where curriculum_id = $1`,
+    [curriculumId],
+  );
+
   const inserted = await client.query<{ id: string }>(
     `insert into curriculum_version (curriculum_id, version_number, status)
-     values ($1, 1, 'published')
+     values ($1, $2, 'published')
      returning id`,
-    [curriculumId],
+    [curriculumId, Number(nextRows[0].next_version)],
   );
 
   return inserted.rows[0].id;
@@ -314,11 +357,15 @@ export async function listWorkspaceLessons(
 
   return withTenantTransaction(toTenantSession(ctx), async (client) => {
     const row = await getProgramRow(client, input.orgSlug, input.programSlug);
-    const workspaceVersionId = await getOrCreateWorkspaceVersionId(
+    const workspaceVersionId = await findWorkspaceVersionId(
       client,
       row.curriculum_id,
       row.active_published_version_id,
     );
+
+    if (!workspaceVersionId) {
+      return [];
+    }
 
     const { rows } = await client.query<{
       slug: string;
@@ -380,6 +427,21 @@ export async function createFirstDraftLesson(
         ).rows[0].id;
       }
 
+      const existingLesson = await client.query<{ id: string }>(
+        `select lv.id
+         from lesson_version lv
+         where lv.track_id = $1
+           and lv.slug = $2
+         limit 1`,
+        [trackId, input.slug],
+      );
+
+      if (existingLesson.rows[0]) {
+        throw new ConflictError(
+          "A lesson with this slug already exists in the draft curriculum.",
+        );
+      }
+
       const positionRows = await client.query<{ next_position: string }>(
         `select coalesce(max(position), 0) + 1 as next_position
          from lesson_version
@@ -404,8 +466,13 @@ export async function createFirstDraftLesson(
       ]);
     });
   } catch (error) {
+    if (error instanceof ConflictError) {
+      throw error;
+    }
     if (isUniqueViolation(error)) {
-      throw new ConflictError("Lesson slug already exists in this program.");
+      throw new ConflictError(
+        "Could not create lesson — slug may already be in use in this draft.",
+      );
     }
     throw error;
   }
