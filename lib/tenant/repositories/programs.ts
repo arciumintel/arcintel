@@ -64,8 +64,9 @@ export async function getProgramBySlug(
       tagline: string | null;
       hub_status: "listed" | "featured" | "internal" | "sunset" | "archived";
       featured_rank: number | null;
+      organization_id: string;
     }>(
-      `select slug, title, tagline, hub_status, featured_rank
+      `select slug, title, tagline, hub_status, featured_rank, organization_id
        from program
        where slug = $1`,
       [programSlug],
@@ -76,12 +77,21 @@ export async function getProgramBySlug(
       throw new NotFoundError();
     }
 
-    if (
-      ctx.kind === "anonymous" &&
-      row.hub_status !== "listed" &&
-      row.hub_status !== "featured"
-    ) {
-      throw new NotFoundError();
+    const isPublicListed =
+      row.hub_status === "listed" || row.hub_status === "featured";
+
+    if (!isPublicListed) {
+      const hasOrgAccess =
+        (ctx.kind === "learner" || ctx.kind === "partner") &&
+        ctx.orgIds.includes(row.organization_id);
+
+      if (
+        ctx.kind !== "staff" &&
+        ctx.kind !== "system" &&
+        !hasOrgAccess
+      ) {
+        throw new NotFoundError();
+      }
     }
 
     return {

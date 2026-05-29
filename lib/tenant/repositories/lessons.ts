@@ -18,29 +18,28 @@ export async function getLessonProgress(
   }
 
   return withTenantTransaction(toTenantSession(ctx), async (client) => {
+    const scopedToUser =
+      ctx.kind !== "staff" && ctx.kind !== "system" ? ctx.userId : null;
+
     const { rows } = await client.query<{
       user_id: string;
       lesson_version_id: string;
       started_at: Date | null;
       completed_at: Date | null;
     }>(
-      `select user_id, lesson_version_id, started_at, completed_at
-       from lesson_progress
-       where lesson_version_id = $1`,
-      [lessonVersionId],
+      scopedToUser
+        ? `select user_id, lesson_version_id, started_at, completed_at
+           from lesson_progress
+           where lesson_version_id = $1 and user_id = $2`
+        : `select user_id, lesson_version_id, started_at, completed_at
+           from lesson_progress
+           where lesson_version_id = $1`,
+      scopedToUser ? [lessonVersionId, scopedToUser] : [lessonVersionId],
     );
 
     const row = rows[0];
     if (!row) {
       throw new NotFoundError();
-    }
-
-    if (
-      ctx.kind !== "staff" &&
-      ctx.kind !== "system" &&
-      row.user_id !== ctx.userId
-    ) {
-      throw new ForbiddenError();
     }
 
     return {
