@@ -2,44 +2,45 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import LessonBlockRenderer from "@/components/lessons/LessonBlockRenderer";
-import { findLesson, getProgramBySlug, listPrograms } from "@/lib/preview-data";
+import HubQuizSection from "@/components/lessons/HubQuizSection";
+import { loadHubLesson, loadHubStaticParams } from "@/lib/hub/programs";
 
 interface Props {
   params: Promise<{ programSlug: string; lessonSlug: string }>;
 }
 
+export const dynamic = "force-dynamic";
+
 export async function generateStaticParams() {
-  const out: { programSlug: string; lessonSlug: string }[] = [];
-  for (const program of listPrograms()) {
-    for (const track of program.tracks) {
-      for (const lesson of track.lessons) {
-        out.push({ programSlug: program.slug, lessonSlug: lesson.slug });
-      }
-    }
+  if (process.env.DATABASE_URL) {
+    return [];
   }
-  return out;
+
+  const params = await loadHubStaticParams();
+  return params
+    .filter(
+      (entry): entry is { programSlug: string; lessonSlug: string } =>
+        entry.lessonSlug !== undefined,
+    )
+    .map(({ programSlug, lessonSlug }) => ({ programSlug, lessonSlug }));
 }
 
 export async function generateMetadata({ params }: Props) {
   const { programSlug, lessonSlug } = await params;
-  const lesson = findLesson(programSlug, lessonSlug);
+  const lesson = await loadHubLesson({ programSlug, lessonSlug });
   if (!lesson) return { title: "Not found" };
   return { title: lesson.title, description: lesson.blurb };
 }
 
 export default async function LessonPage({ params }: Props) {
   const { programSlug, lessonSlug } = await params;
-  const lesson = findLesson(programSlug, lessonSlug);
-  const program = getProgramBySlug(programSlug);
-  if (!lesson || !program) notFound();
+  const lesson = await loadHubLesson({ programSlug, lessonSlug });
+  if (!lesson) notFound();
 
-  const flat = program.tracks.flatMap((t) =>
-    t.lessons.map((l) => ({ slug: l.slug, title: l.title, trackTitle: t.title })),
-  );
-  const idx = flat.findIndex((l) => l.slug === lesson.slug);
-  const prev = idx > 0 ? flat[idx - 1] : null;
-  const next = idx >= 0 && idx < flat.length - 1 ? flat[idx + 1] : null;
-  const lessonNumberLabel = String(idx + 1).padStart(2, "0");
+  const { flat, index } = lesson.navigation;
+  const prev = index > 0 ? flat[index - 1] : null;
+  const next = index >= 0 && index < flat.length - 1 ? flat[index + 1] : null;
+  const lessonNumberLabel = String(index + 1).padStart(2, "0");
 
   return (
     <div className="mx-auto w-full max-w-3xl pb-32 pt-10 md:pt-14">
@@ -53,8 +54,8 @@ export default async function LessonPage({ params }: Props) {
         <span aria-hidden className="text-ink-faint">
           /
         </span>
-        <Link href={`/programs/${program.slug}`} className="hover:text-ink">
-          {program.title}
+        <Link href={`/programs/${lesson.programSlug}`} className="hover:text-ink">
+          {lesson.programTitle}
         </Link>
         <span aria-hidden className="text-ink-faint">
           /
@@ -108,65 +109,7 @@ export default async function LessonPage({ params }: Props) {
         <LessonBlockRenderer blocks={lesson.blocks} />
       </article>
 
-      {lesson.quiz ? (
-        <section className="mt-20 border-t border-ink/30 pt-12">
-          <header className="mb-7">
-            <p className="font-mono text-[0.66rem] uppercase tracking-[0.18em] text-accent">
-              Comprehension check
-            </p>
-            <h2 className="mt-2 font-sans text-[1.7rem] font-bold tracking-[-0.025em] text-ink md:text-[2rem]">
-              Check yourself<span className="text-accent">.</span>
-            </h2>
-          </header>
-          <div className="border border-ink/15 bg-paper-deep p-6 md:p-8">
-            <ol className="space-y-8">
-              {lesson.quiz.questions.map((q, qi) => (
-                <li key={q.id}>
-                  <div className="mb-3 flex items-baseline gap-2 font-mono text-[0.6rem] uppercase tracking-[0.18em] text-ink-soft">
-                    <span className="text-accent num-tabular">Q{String(qi + 1).padStart(2, "0")}</span>
-                    <span>{q.type === "single" ? "Single choice" : "Short answer"}</span>
-                  </div>
-                  <p className="mb-4 font-sans text-[1.05rem] leading-[1.5] text-ink">{q.prompt}</p>
-                  {q.type === "single" ? (
-                    <ul className="space-y-2">
-                      {q.choices.map((choice, ci) => (
-                        <li key={ci}>
-                          <label className="group flex cursor-pointer items-baseline gap-3">
-                            <input
-                              type="radio"
-                              name={q.id}
-                              className="mt-1 h-3 w-3 accent-[var(--accent-c,#C5462E)]"
-                            />
-                            <span className="font-sans text-[0.98rem] leading-[1.5] text-ink-muted group-hover:text-ink">
-                              {choice}
-                            </span>
-                          </label>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <textarea
-                      className="min-h-[80px] w-full border border-ink/15 bg-background p-3 font-sans text-[0.98rem] leading-[1.55] text-ink placeholder:text-ink-soft/60 focus:border-accent focus:outline-none"
-                      placeholder="One or two sentences."
-                    />
-                  )}
-                </li>
-              ))}
-            </ol>
-            <div className="mt-8 flex items-center gap-4">
-              <button
-                type="button"
-                className="bg-ink px-5 py-2.5 font-sans text-[0.86rem] font-semibold text-paper-deep transition-colors hover:bg-accent"
-              >
-                Submit answers
-              </button>
-              <span className="font-mono text-[0.6rem] uppercase tracking-[0.18em] text-ink-soft">
-                Not submitted
-              </span>
-            </div>
-          </div>
-        </section>
-      ) : null}
+      {lesson.quiz ? <HubQuizSection quiz={lesson.quiz} /> : null}
 
       <nav
         aria-label="Lesson navigation"
@@ -174,7 +117,7 @@ export default async function LessonPage({ params }: Props) {
       >
         {prev ? (
           <Link
-            href={`/programs/${program.slug}/lessons/${prev.slug}`}
+            href={`/programs/${lesson.programSlug}/lessons/${prev.slug}`}
             className="ui-tap group max-w-sm"
           >
             <span className="inline-flex items-center gap-1.5 font-mono text-[0.62rem] uppercase tracking-[0.18em] text-ink-soft">
@@ -191,7 +134,7 @@ export default async function LessonPage({ params }: Props) {
         )}
         {next ? (
           <Link
-            href={`/programs/${program.slug}/lessons/${next.slug}`}
+            href={`/programs/${lesson.programSlug}/lessons/${next.slug}`}
             className="ui-tap group max-w-sm sm:text-right"
           >
             <span className="inline-flex items-center gap-1.5 font-mono text-[0.62rem] uppercase tracking-[0.18em] text-ink-soft">

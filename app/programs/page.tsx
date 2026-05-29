@@ -1,14 +1,16 @@
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
-import { listPrograms } from "@/lib/preview-data";
+import { loadHubPrograms } from "@/lib/hub/programs";
 
 export const metadata = {
   title: "Programs",
   description: "The full Arcademy program catalog — every learning path on the hub.",
 };
 
+export const dynamic = "force-dynamic";
+
 export default async function ProgramsPage() {
-  const programs = listPrograms();
+  const programs = await loadHubPrograms();
 
   return (
     <div className="mx-auto w-full max-w-[1440px] pb-32 pt-10 md:pt-16">

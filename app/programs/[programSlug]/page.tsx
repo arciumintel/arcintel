@@ -1,26 +1,33 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowUpRight } from "lucide-react";
-import { getProgramBySlug, listPrograms } from "@/lib/preview-data";
+import { loadHubProgram, loadHubPrograms } from "@/lib/hub/programs";
 
 interface Props {
   params: Promise<{ programSlug: string }>;
 }
 
+export const dynamic = "force-dynamic";
+
 export async function generateStaticParams() {
-  return listPrograms().map((p) => ({ programSlug: p.slug }));
+  if (process.env.DATABASE_URL) {
+    return [];
+  }
+
+  const programs = await loadHubPrograms();
+  return programs.map((p) => ({ programSlug: p.slug }));
 }
 
 export async function generateMetadata({ params }: Props) {
   const { programSlug } = await params;
-  const program = getProgramBySlug(programSlug);
+  const program = await loadHubProgram(programSlug);
   if (!program) return { title: "Not found" };
   return { title: program.title, description: program.tagline };
 }
 
 export default async function ProgramPage({ params }: Props) {
   const { programSlug } = await params;
-  const program = getProgramBySlug(programSlug);
+  const program = await loadHubProgram(programSlug);
   if (!program) notFound();
 
   const firstLesson = program.tracks[0]?.lessons[0];
@@ -127,9 +134,11 @@ export default async function ProgramPage({ params }: Props) {
                 <h2 className="font-sans text-[1.7rem] font-bold tracking-[-0.025em] text-ink md:text-[2rem]">
                   {track.title}
                 </h2>
-                <p className="mt-1 font-sans text-[1rem] leading-[1.5] text-ink-muted">
-                  {track.description}
-                </p>
+                {track.description ? (
+                  <p className="mt-1 font-sans text-[1rem] leading-[1.5] text-ink-muted">
+                    {track.description}
+                  </p>
+                ) : null}
               </div>
 
               <ol className="border-t border-ink/15">

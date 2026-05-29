@@ -1,15 +1,16 @@
 import Link from "next/link";
 import { ArrowUpRight, BookOpen, ShieldCheck, Users } from "lucide-react";
-import { listPrograms } from "@/lib/preview-data";
+import { loadHubPrograms } from "@/lib/hub/programs";
+
+export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const programs = listPrograms();
+  const programs = await loadHubPrograms();
   const featured = programs.find((p) => p.hubStatus === "featured") ?? programs[0];
   const totalLessons = programs.reduce((s, p) => s + p.lessonCount, 0);
 
   return (
     <div className="relative mx-auto w-full max-w-[1440px] pb-32 pt-10 md:pt-16">
-      {/* ─── HERO ──────────────────────────────────────────────── */}
       <section className="mb-32">
         <div className="mb-10 flex items-start justify-between">
           <div className="flex items-center gap-3">
@@ -74,7 +75,7 @@ export default async function HomePage() {
             {[
               ["Programs", `${programs.length}`],
               ["Lessons", `${totalLessons}`],
-              ["Partners", "1 org"],
+              ["Partners", `${new Set(programs.map((p) => p.org)).size}`],
             ].map(([k, v]) => (
               <div
                 key={k}
@@ -90,7 +91,6 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ─── Three pillars (grid-with-hairlines style) ────────── */}
       <section className="mb-32 grid grid-cols-1 gap-px border-y border-ink/15 bg-ink/15 md:grid-cols-3">
         {[
           {
@@ -127,7 +127,6 @@ export default async function HomePage() {
         ))}
       </section>
 
-      {/* ─── On the hub — programs ─────────────────────────── */}
       <section className="mb-24">
         <div className="mb-10 flex items-baseline justify-between border-b border-ink/15 pb-5">
           <div className="flex items-center gap-3">
