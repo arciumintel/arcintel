@@ -132,7 +132,7 @@ A program appears on the public hub only when **all** are true: `hub_status` is 
 | `/programs/[programSlug]` | 1 | Program home: path, enroll/continue CTA |
 | `/programs/[programSlug]/lessons/[lessonSlug]` | 1 | Lesson player |
 | `/account` | 1 | Global learner: enrollments, per-program progress |
-| `/staff/*` | 2 | Staff Studio (org/program scoped authoring + publish) |
+| `/staff/*` | 2 | Staff Studio (org/program scoped authoring + publish). **Slice A shipped:** org list, create program, overview, settings, curriculum first-lesson stub — see `docs/superpowers/specs/2026-05-28-staff-program-shell-design.md`. |
 | `/partner/*` | 3 | Partner Studio (trusted orgs, draft + submit for review) |
 
 There is no `/modules` route. Optional redirects from a prior product belong in edge config or `middleware.ts` — not in core routing design.

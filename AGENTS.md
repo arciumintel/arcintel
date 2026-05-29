@@ -59,5 +59,6 @@ Launch program **Arcium** (`program.slug = arcium`) is seeded via migration/scri
 ## Other things
 
 - First launch program slug: **`arcium`**
+- Staff Studio slice A: `/staff/organizations/...` — create internal programs; requires `STAFF_USER_IDS` in env
 - Product name: **Arcademy**
 - Open engineering questions live in `docs/AGENT-PLATFORM.md` — resolve before implementing those areas

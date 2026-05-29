@@ -12,6 +12,10 @@ function ShellInner({ children }: { children: ReactNode }) {
   const { collapsed } = useSpine();
   const pathname = usePathname();
 
+  if (pathname.startsWith("/staff")) {
+    return <>{children}</>;
+  }
+
   return (
     <>
       <a href="#main-content" className="skip-to-content">
