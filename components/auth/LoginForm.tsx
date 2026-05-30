@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { authClient } from "@/lib/auth-client";
+import { runGuestProgressMerge } from "@/lib/guest/run-merge";
 import type { SocialAuthProvider } from "@/lib/auth-providers";
 import SocialAuthButtons from "./SocialAuthButtons";
 
@@ -44,6 +45,7 @@ export default function LoginForm({
       return;
     }
 
+    await runGuestProgressMerge();
     router.push(callbackURL);
     router.refresh();
   }

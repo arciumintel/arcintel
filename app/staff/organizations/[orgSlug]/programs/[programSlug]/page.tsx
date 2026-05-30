@@ -2,7 +2,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { resolveTenantContext } from "@/lib/tenant/context";
-import { getStaffProgramOverview } from "@/lib/tenant/repositories/staff-programs";
+import {
+  getStaffProgramOverview,
+  listWorkspaceLessons,
+} from "@/lib/tenant/repositories/staff-programs";
 import StaffProgramShell from "@/components/staff/StaffProgramShell";
 import ProgramStatusChips from "@/components/staff/ProgramStatusChips";
 import ProgramOverviewEmptyState from "@/components/staff/ProgramOverviewEmptyState";
@@ -31,6 +34,12 @@ export default async function StaffProgramOverviewPage({ params }: PageProps) {
   const previewEnabled =
     overview.activePublishedVersionId !== null &&
     (overview.hubStatus === "listed" || overview.hubStatus === "featured");
+
+  const lessons =
+    overview.lessonCount > 0
+      ? await listWorkspaceLessons(ctx, { orgSlug, programSlug })
+      : [];
+  const firstLesson = lessons[0] ?? null;
 
   return (
     <StaffProgramShell
@@ -81,14 +90,24 @@ export default async function StaffProgramOverviewPage({ params }: PageProps) {
             {overview.lessonCount === 1 ? "lesson" : "lessons"}
           </p>
           <p className="mt-3 font-body text-body-sm text-ink-muted">
-            Draft lessons are in progress. Open the curriculum view to add more.
+            Draft lessons are in progress. Open the curriculum view to add more or reorder.
           </p>
-          <Link
-            href={`${base}/curriculum`}
-            className="mt-6 inline-flex rounded-sm bg-accent px-5 py-2.5 font-sans text-[0.92rem] font-medium text-accent-on hover:bg-accent-deep"
-          >
-            View curriculum
-          </Link>
+          <div className="mt-6 flex flex-wrap gap-4">
+            <Link
+              href={`${base}/curriculum`}
+              className="inline-flex rounded-sm bg-accent px-5 py-2.5 font-sans text-[0.92rem] font-medium text-accent-on hover:bg-accent-deep"
+            >
+              View curriculum
+            </Link>
+            {firstLesson ? (
+              <Link
+                href={`${base}/curriculum/lessons/${firstLesson.slug}`}
+                className="inline-flex items-center px-2 py-2.5 font-sans text-[0.88rem] text-accent hover:underline"
+              >
+                Open first lesson
+              </Link>
+            ) : null}
+          </div>
         </div>
       )}
     </StaffProgramShell>

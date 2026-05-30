@@ -45,16 +45,28 @@ export function estimateProgramHours(lessonCount: number): number {
   return Math.max(1, Math.ceil((lessonCount * 10) / 60));
 }
 
+function toHubQuizQuestionImage(
+  image: NonNullable<PublicQuiz["questions"][number]["image"]>,
+) {
+  return {
+    cloudinary_url: image.cloudinary_url,
+    alt: localeText(image.alt),
+  };
+}
+
 export function toHubQuizView(quiz: PublicQuiz): HubQuizView {
   return {
     passThreshold: quiz.scoringConfig.passThreshold,
     questions: quiz.questions.map((question) => {
+      const image = question.image ? toHubQuizQuestionImage(question.image) : undefined;
+
       if (question.type === "multiple_choice") {
         return {
           id: question.id,
           type: "multiple_choice" as const,
           prompt: question.prompt,
           options: question.options,
+          ...(image ? { image } : {}),
         };
       }
 
@@ -63,6 +75,7 @@ export function toHubQuizView(quiz: PublicQuiz): HubQuizView {
           id: question.id,
           type: "true_false" as const,
           prompt: question.prompt,
+          ...(image ? { image } : {}),
         };
       }
 
@@ -70,6 +83,7 @@ export function toHubQuizView(quiz: PublicQuiz): HubQuizView {
         id: question.id,
         type: "short_text" as const,
         prompt: question.prompt,
+        ...(image ? { image } : {}),
       };
     }),
   };

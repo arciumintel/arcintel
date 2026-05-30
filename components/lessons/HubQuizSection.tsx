@@ -30,6 +30,16 @@ export default function HubQuizSection({ quiz }: { quiz: HubQuizView }) {
               <p className="mb-4 font-sans text-[1.05rem] leading-[1.5] text-ink">
                 {question.prompt}
               </p>
+              {question.image ? (
+                <figure className="mb-4">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={question.image.cloudinary_url}
+                    alt={question.image.alt}
+                    className="block w-full max-w-2xl border border-ink/15"
+                  />
+                </figure>
+              ) : null}
               {question.type === "multiple_choice" ? (
                 <ul className="space-y-2">
                   {question.options.map((choice, ci) => (

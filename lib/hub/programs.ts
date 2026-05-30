@@ -96,6 +96,8 @@ function previewToLesson(
   return {
     slug: lesson.slug,
     programSlug: program.slug,
+    programId: `preview:${program.slug}`,
+    lessonVersionId: `preview:${program.slug}:${lesson.slug}`,
     programTitle: program.title,
     trackSlug: lesson.trackSlug,
     trackTitle: lesson.trackTitle,

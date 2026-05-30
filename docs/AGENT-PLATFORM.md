@@ -289,7 +289,7 @@ Trust gate is **manual**: staff sets `organization.trust_level = self_serve_draf
 | # | Question | Phase |
 | --- | --- | --- |
 | 1 | First non-Arcium pilot partner — which app? | 2 |
-| 2 | Enroll on explicit action vs first activity? | 1 |
+| 2 | Enroll on **explicit Enroll button** on program home (not first activity). Pins `active_published_version_id` at enroll time. | 1 |
 | 3 | Partner preview tokens: TTL and auth? | 2 |
 | 4 | ~~Neon pooler vs unpooled for RLS session vars?~~ **Resolved:** use `DATABASE_URL_UNPOOLED` for migrations, seeds, and all `withTenantTransaction()` calls; pooled URL reserved for future read-only paths. | 0 |
 | 6 | Legal: partner terms for user progress data sharing? | 2 |

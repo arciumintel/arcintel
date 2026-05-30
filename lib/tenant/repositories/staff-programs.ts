@@ -1,5 +1,5 @@
 import type { PoolClient } from "pg";
-import { ConflictError, NotFoundError } from "@/lib/errors";
+import { AppError, ConflictError, NotFoundError } from "@/lib/errors";
 import { withTenantTransaction } from "@/lib/db";
 import { toTenantSession, type TenantContext } from "@/lib/tenant/context";
 import { requireStaff } from "@/lib/tenant/require-staff";
@@ -35,6 +35,11 @@ export type StaffProgramOverview = {
 export type StaffLessonRow = {
   slug: string;
   title: string;
+  position: number;
+};
+
+export type StaffWorkspaceLesson = StaffLessonRow & {
+  id: string;
 };
 
 type ProgramRow = {
@@ -196,6 +201,77 @@ async function getOrCreateWorkspaceVersionId(
   );
 
   return inserted.rows[0].id;
+}
+
+async function getWorkspaceContext(
+  client: PoolClient,
+  orgSlug: string,
+  programSlug: string,
+) {
+  const row = await getProgramRow(client, orgSlug, programSlug);
+  const workspaceVersionId = await findWorkspaceVersionId(
+    client,
+    row.curriculum_id,
+    row.active_published_version_id,
+  );
+
+  if (!workspaceVersionId) {
+    return { row, workspaceVersionId: null, trackId: null };
+  }
+
+  const trackRow = (
+    await client.query<{ id: string }>(
+      `select id from track
+       where curriculum_version_id = $1
+       order by position asc
+       limit 1`,
+      [workspaceVersionId],
+    )
+  ).rows[0];
+
+  return {
+    row,
+    workspaceVersionId,
+    trackId: trackRow?.id ?? null,
+  };
+}
+
+async function listWorkspaceLessonsInTrack(
+  client: PoolClient,
+  trackId: string,
+): Promise<StaffLessonRow[]> {
+  const { rows } = await client.query<{
+    slug: string;
+    title: Record<string, string>;
+    position: number;
+  }>(
+    `select lv.slug, lv.title, lv.position
+     from lesson_version lv
+     where lv.track_id = $1
+     order by lv.position asc`,
+    [trackId],
+  );
+
+  return rows.map((lesson) => ({
+    slug: lesson.slug,
+    title: lesson.title.en ?? Object.values(lesson.title)[0] ?? lesson.slug,
+    position: lesson.position,
+  }));
+}
+
+async function compactLessonPositions(client: PoolClient, trackId: string) {
+  await client.query(
+    `with ordered as (
+       select id, row_number() over (order by position asc)::int as new_position
+       from lesson_version
+       where track_id = $1
+     )
+     update lesson_version lv
+     set position = ordered.new_position
+     from ordered
+     where lv.id = ordered.id`,
+    [trackId],
+  );
 }
 
 export async function listProgramsForOrg(
@@ -370,8 +446,9 @@ export async function listWorkspaceLessons(
     const { rows } = await client.query<{
       slug: string;
       title: Record<string, string>;
+      position: number;
     }>(
-      `select lv.slug, lv.title
+      `select lv.slug, lv.title, lv.position
        from track t
        join lesson_version lv on lv.track_id = t.id
        where t.curriculum_version_id = $1
@@ -382,11 +459,12 @@ export async function listWorkspaceLessons(
     return rows.map((lesson) => ({
       slug: lesson.slug,
       title: lesson.title.en ?? Object.values(lesson.title)[0] ?? lesson.slug,
+      position: lesson.position,
     }));
   });
 }
 
-export async function createFirstDraftLesson(
+export async function createDraftLesson(
   ctx: TenantContext,
   input: {
     orgSlug: string;
@@ -476,4 +554,248 @@ export async function createFirstDraftLesson(
     }
     throw error;
   }
+}
+
+/** @deprecated Use createDraftLesson */
+export const createFirstDraftLesson = createDraftLesson;
+
+export async function getWorkspaceLesson(
+  ctx: TenantContext,
+  input: { orgSlug: string; programSlug: string; lessonSlug: string },
+): Promise<StaffWorkspaceLesson> {
+  requireStaff(ctx);
+
+  return withTenantTransaction(toTenantSession(ctx), async (client) => {
+    const { trackId } = await getWorkspaceContext(
+      client,
+      input.orgSlug,
+      input.programSlug,
+    );
+
+    if (!trackId) {
+      throw new NotFoundError();
+    }
+
+    const { rows } = await client.query<{
+      id: string;
+      slug: string;
+      title: Record<string, string>;
+      position: number;
+    }>(
+      `select lv.id, lv.slug, lv.title, lv.position
+       from lesson_version lv
+       where lv.track_id = $1
+         and lv.slug = $2
+       limit 1`,
+      [trackId, input.lessonSlug],
+    );
+
+    const lesson = rows[0];
+    if (!lesson) {
+      throw new NotFoundError();
+    }
+
+    return {
+      id: lesson.id,
+      slug: lesson.slug,
+      title: lesson.title.en ?? Object.values(lesson.title)[0] ?? lesson.slug,
+      position: lesson.position,
+    };
+  });
+}
+
+export async function updateDraftLessonMetadata(
+  ctx: TenantContext,
+  input: {
+    orgSlug: string;
+    programSlug: string;
+    lessonSlug: string;
+    title: string;
+    slug: string;
+  },
+): Promise<{ slug: string }> {
+  requireStaff(ctx);
+
+  try {
+    return await withTenantTransaction(toTenantSession(ctx), async (client) => {
+      const { row, trackId } = await getWorkspaceContext(
+        client,
+        input.orgSlug,
+        input.programSlug,
+      );
+
+      if (!trackId) {
+        throw new NotFoundError();
+      }
+
+      const current = (
+        await client.query<{ id: string }>(
+          `select id from lesson_version
+           where track_id = $1 and slug = $2
+           limit 1`,
+          [trackId, input.lessonSlug],
+        )
+      ).rows[0];
+
+      if (!current) {
+        throw new NotFoundError();
+      }
+
+      if (input.slug !== input.lessonSlug) {
+        const conflict = (
+          await client.query<{ id: string }>(
+            `select id from lesson_version
+             where track_id = $1 and slug = $2 and id <> $3
+             limit 1`,
+            [trackId, input.slug, current.id],
+          )
+        ).rows[0];
+
+        if (conflict) {
+          throw new ConflictError(
+            "A lesson with this slug already exists in the draft curriculum.",
+          );
+        }
+      }
+
+      await client.query(
+        `update lesson_version
+         set slug = $2,
+             title = $3::jsonb
+         where id = $1`,
+        [current.id, input.slug, JSON.stringify({ en: input.title })],
+      );
+
+      await client.query(`update program set updated_at = now() where id = $1`, [
+        row.program_id,
+      ]);
+
+      return { slug: input.slug };
+    });
+  } catch (error) {
+    if (error instanceof ConflictError || error instanceof NotFoundError) {
+      throw error;
+    }
+    if (isUniqueViolation(error)) {
+      throw new ConflictError(
+        "Could not update lesson — slug may already be in use in this draft.",
+      );
+    }
+    throw error;
+  }
+}
+
+export async function reorderDraftLesson(
+  ctx: TenantContext,
+  input: {
+    orgSlug: string;
+    programSlug: string;
+    lessonSlug: string;
+    direction: "up" | "down";
+  },
+): Promise<void> {
+  requireStaff(ctx);
+
+  await withTenantTransaction(toTenantSession(ctx), async (client) => {
+    const { row, trackId } = await getWorkspaceContext(
+      client,
+      input.orgSlug,
+      input.programSlug,
+    );
+
+    if (!trackId) {
+      throw new NotFoundError();
+    }
+
+    const lessons = await listWorkspaceLessonsInTrack(client, trackId);
+    const index = lessons.findIndex((lesson) => lesson.slug === input.lessonSlug);
+
+    if (index === -1) {
+      throw new NotFoundError();
+    }
+
+    const swapIndex = input.direction === "up" ? index - 1 : index + 1;
+    if (swapIndex < 0 || swapIndex >= lessons.length) {
+      return;
+    }
+
+    const current = lessons[index];
+    const adjacent = lessons[swapIndex];
+
+    const ids = await client.query<{ id: string; slug: string }>(
+      `select id, slug from lesson_version
+       where track_id = $1 and slug = any($2::text[])`,
+      [trackId, [current.slug, adjacent.slug]],
+    );
+
+    const currentId = ids.rows.find((r) => r.slug === current.slug)?.id;
+    const adjacentId = ids.rows.find((r) => r.slug === adjacent.slug)?.id;
+
+    if (!currentId || !adjacentId) {
+      throw new NotFoundError();
+    }
+
+    await client.query(`update lesson_version set position = -1 where id = $1`, [
+      currentId,
+    ]);
+    await client.query(
+      `update lesson_version set position = $1 where id = $2`,
+      [current.position, adjacentId],
+    );
+    await client.query(
+      `update lesson_version set position = $1 where id = $2`,
+      [adjacent.position, currentId],
+    );
+
+    await client.query(`update program set updated_at = now() where id = $1`, [
+      row.program_id,
+    ]);
+  });
+}
+
+export async function deleteDraftLesson(
+  ctx: TenantContext,
+  input: { orgSlug: string; programSlug: string; lessonSlug: string },
+): Promise<void> {
+  requireStaff(ctx);
+
+  await withTenantTransaction(toTenantSession(ctx), async (client) => {
+    const { row, trackId } = await getWorkspaceContext(
+      client,
+      input.orgSlug,
+      input.programSlug,
+    );
+
+    if (!trackId) {
+      throw new NotFoundError();
+    }
+
+    const lessons = await listWorkspaceLessonsInTrack(client, trackId);
+    if (lessons.length <= 1) {
+      throw new AppError("Programs must keep at least one draft lesson.", 400);
+    }
+
+    const target = lessons.find((lesson) => lesson.slug === input.lessonSlug);
+    if (!target) {
+      throw new NotFoundError();
+    }
+
+    const { rowCount } = await client.query(
+      `delete from lesson_version lv
+       using track t
+       where lv.track_id = t.id
+         and t.id = $1
+         and lv.slug = $2`,
+      [trackId, input.lessonSlug],
+    );
+
+    if (!rowCount) {
+      throw new NotFoundError();
+    }
+
+    await compactLessonPositions(client, trackId);
+    await client.query(`update program set updated_at = now() where id = $1`, [
+      row.program_id,
+    ]);
+  });
 }

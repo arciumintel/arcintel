@@ -31,15 +31,26 @@ export type HubProgramDetail = HubProgramSummary & {
   tracks: HubTrack[];
 };
 
-export type HubQuizQuestionView =
-  | {
-      id: string;
-      type: "multiple_choice";
-      prompt: string;
-      options: string[];
-    }
-  | { id: string; type: "short_text"; prompt: string }
-  | { id: string; type: "true_false"; prompt: string };
+export type HubQuizQuestionImageView = {
+  cloudinary_url: string;
+  alt: string;
+};
+
+type HubQuizQuestionBase = {
+  id: string;
+  prompt: string;
+  image?: HubQuizQuestionImageView;
+};
+
+export type HubQuizQuestionView = HubQuizQuestionBase &
+  (
+    | {
+        type: "multiple_choice";
+        options: string[];
+      }
+    | { type: "short_text" }
+    | { type: "true_false" }
+  );
 
 export type HubQuizView = {
   passThreshold: number;
@@ -49,6 +60,8 @@ export type HubQuizView = {
 export type HubLessonDetail = {
   slug: string;
   programSlug: string;
+  programId: string;
+  lessonVersionId: string;
   programTitle: string;
   trackSlug: string;
   trackTitle: string;

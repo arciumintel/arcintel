@@ -1,9 +1,23 @@
 import { z } from "zod";
 
+/** Locale map for image alt text (matches lesson block `alt` / `caption` shape). */
+const quizImageAltSchema = z
+  .object({
+    en: z.string().min(1),
+  })
+  .catchall(z.string());
+
+/** Optional prompt illustration; same Cloudinary + alt shape as lesson `image` blocks. */
+export const quizQuestionImageSchema = z.object({
+  cloudinary_url: z.string().url().max(2048),
+  alt: quizImageAltSchema,
+});
+
 const baseQuestionSchema = z.object({
   id: z.string().min(1).max(120),
   prompt: z.string().min(1).max(5000),
   points: z.number().int().min(1).max(100).default(1),
+  image: quizQuestionImageSchema.optional(),
 });
 
 export const shortTextQuestionSchema = baseQuestionSchema.extend({
@@ -40,6 +54,7 @@ export const scoringConfigSchema = z.object({
   cooldownSeconds: z.number().int().min(0).max(86400).default(0),
 });
 
+export type QuizQuestionImage = z.infer<typeof quizQuestionImageSchema>;
 export type QuizQuestion = z.infer<typeof quizQuestionSchema>;
 export type ScoringConfig = z.infer<typeof scoringConfigSchema>;
 

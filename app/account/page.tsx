@@ -31,9 +31,8 @@ export default async function AccountPage() {
             You&rsquo;re reading without an account.
           </p>
           <p className="mt-4 font-sans text-[1rem] leading-[1.6] text-ink-muted">
-            Phase 1 of Arcademy includes a guest-friendly path: open Lesson 01 of any featured
-            program, read it through, and choose to save progress on completion. Until you sign up,
-            nothing is tracked beyond the current tab.
+            Lesson 1 is open without an account. Sign in to save your reading progress, then
+            enroll to unlock the rest of the program.
           </p>
           <div className="mt-7 flex flex-wrap items-center gap-4">
             <Link

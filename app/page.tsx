@@ -1,11 +1,19 @@
 import Link from "next/link";
 import { ArrowUpRight, BookOpen, ShieldCheck, Users } from "lucide-react";
+import HubContinueSection from "@/components/hub/HubContinueSection";
 import { loadHubPrograms } from "@/lib/hub/programs";
+import { listLearnerEnrollments } from "@/lib/tenant/repositories/enrollments";
+import { resolveTenantContext } from "@/lib/tenant/context";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
   const programs = await loadHubPrograms();
+  const ctx = await resolveTenantContext();
+  const enrollments =
+    ctx.kind === "anonymous" || ctx.kind === "system"
+      ? []
+      : await listLearnerEnrollments(ctx);
   const featured = programs.find((p) => p.hubStatus === "featured") ?? programs[0];
   const totalLessons = programs.reduce((s, p) => s + p.lessonCount, 0);
 
@@ -90,6 +98,8 @@ export default async function HomePage() {
           </dl>
         </div>
       </section>
+
+      <HubContinueSection enrollments={enrollments} />
 
       <section className="mb-32 grid grid-cols-1 gap-px border-y border-ink/15 bg-ink/15 md:grid-cols-3">
         {[

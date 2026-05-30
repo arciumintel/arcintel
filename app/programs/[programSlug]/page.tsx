@@ -1,10 +1,13 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowUpRight } from "lucide-react";
-import { loadHubProgram, loadHubPrograms } from "@/lib/hub/programs";
+import ProgramEnrollCTA from "@/components/programs/ProgramEnrollCTA";
+import { PREVIEW_MODE, loadHubProgram, loadHubPrograms } from "@/lib/hub/programs";
+import { getProgramEnrollmentStatus } from "@/lib/tenant/repositories/enrollments";
+import { resolveTenantContext } from "@/lib/tenant/context";
 
 interface Props {
   params: Promise<{ programSlug: string }>;
+  searchParams: Promise<{ enrolled?: string }>;
 }
 
 export const dynamic = "force-dynamic";
@@ -25,12 +28,24 @@ export async function generateMetadata({ params }: Props) {
   return { title: program.title, description: program.tagline };
 }
 
-export default async function ProgramPage({ params }: Props) {
+export default async function ProgramPage({ params, searchParams }: Props) {
   const { programSlug } = await params;
+  const { enrolled } = await searchParams;
   const program = await loadHubProgram(programSlug);
   if (!program) notFound();
 
   const firstLesson = program.tracks[0]?.lessons[0];
+  const ctx = await resolveTenantContext();
+  const enrollment = PREVIEW_MODE
+    ? {
+        isEnrolled: false,
+        continueLessonSlug: null,
+        firstLessonSlug: firstLesson?.slug ?? null,
+      }
+    : await getProgramEnrollmentStatus(ctx, programSlug);
+
+  const authState =
+    ctx.kind === "anonymous" || ctx.kind === "system" ? "anonymous" : "signed_in";
 
   return (
     <div className="mx-auto w-full max-w-[1440px] pb-32 pt-10 md:pt-16">
@@ -62,24 +77,16 @@ export default async function ProgramPage({ params }: Props) {
             {program.tagline}
           </p>
 
-          {firstLesson ? (
-            <div className="mt-10 flex flex-wrap items-center gap-5">
-              <Link
-                href={`/programs/${program.slug}/lessons/${firstLesson.slug}`}
-                className="group inline-flex items-center gap-2 bg-ink px-6 py-3.5 font-sans text-[0.9rem] font-semibold text-paper-deep transition-colors hover:bg-accent"
-              >
-                Begin reading
-                <ArrowUpRight
-                  size={15}
-                  strokeWidth={1.8}
-                  className="transition-transform group-hover:translate-x-[2px] group-hover:-translate-y-[2px]"
-                />
-              </Link>
-              <span className="font-mono text-[0.66rem] uppercase tracking-[0.14em] text-ink-soft">
-                Starts with: {firstLesson.title}
-              </span>
-            </div>
-          ) : null}
+          <ProgramEnrollCTA
+            programSlug={program.slug}
+            firstLessonSlug={firstLesson?.slug ?? enrollment.firstLessonSlug}
+            firstLessonTitle={firstLesson?.title ?? null}
+            previewMode={PREVIEW_MODE}
+            authState={authState}
+            isEnrolled={enrollment.isEnrolled}
+            continueLessonSlug={enrollment.continueLessonSlug}
+            showEnrolledNotice={enrolled === "1"}
+          />
         </div>
 
         <dl className="grid grid-cols-2 gap-x-4 gap-y-3 border-t border-ink/15 pt-5 md:grid-cols-1">

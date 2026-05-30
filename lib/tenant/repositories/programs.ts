@@ -335,12 +335,55 @@ export async function getHubProgramDetail(
   });
 }
 
+export async function getPublishedLessonIdentity(
+  ctx: TenantContext,
+  input: { programSlug: string; lessonSlug: string },
+): Promise<{ programId: string; lessonVersionId: string }> {
+  return withTenantTransaction(toTenantSession(ctx), async (client) => {
+    const { rows } = await client.query<{
+      program_id: string;
+      lesson_version_id: string;
+      hub_status: string;
+    }>(
+      `select p.id as program_id,
+              lv.id as lesson_version_id,
+              p.hub_status::text as hub_status
+       from program p
+       join curriculum_version cv on cv.id = p.active_published_version_id
+       join track t on t.curriculum_version_id = cv.id
+       join lesson_version lv on lv.track_id = t.id
+       where p.slug = $1
+         and lv.slug = $2`,
+      [input.programSlug, input.lessonSlug],
+    );
+
+    const row = rows[0];
+    if (!row) {
+      throw new NotFoundError();
+    }
+
+    if (
+      ctx.kind === "anonymous" &&
+      row.hub_status !== "listed" &&
+      row.hub_status !== "featured"
+    ) {
+      throw new NotFoundError();
+    }
+
+    return {
+      programId: row.program_id,
+      lessonVersionId: row.lesson_version_id,
+    };
+  });
+}
+
 export async function getHubLessonDetail(
   ctx: TenantContext,
   input: { programSlug: string; lessonSlug: string },
 ): Promise<HubLessonDetail> {
   const program = await getHubProgramDetail(ctx, input.programSlug);
   const lesson = await getPublishedLessonVersion(ctx, input);
+  const identity = await getPublishedLessonIdentity(ctx, input);
 
   const flat = program.tracks.flatMap((track) =>
     track.lessons.map((entry) => ({
@@ -359,6 +402,8 @@ export async function getHubLessonDetail(
   return {
     slug: lesson.slug,
     programSlug: program.slug,
+    programId: identity.programId,
+    lessonVersionId: identity.lessonVersionId,
     programTitle: program.title,
     trackSlug: track?.slug ?? "",
     trackTitle: track?.title ?? "",

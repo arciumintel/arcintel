@@ -3,10 +3,16 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import LessonBlockRenderer from "@/components/lessons/LessonBlockRenderer";
 import HubQuizSection from "@/components/lessons/HubQuizSection";
-import { loadHubLesson, loadHubStaticParams } from "@/lib/hub/programs";
+import LessonAccessGate from "@/components/lessons/LessonAccessGate";
+import GuestLessonTracker from "@/components/guest/GuestLessonTracker";
+import { resolveLessonAccess } from "@/lib/hub/lesson-access";
+import { PREVIEW_MODE, loadHubLesson, loadHubStaticParams } from "@/lib/hub/programs";
+import { getProgramEnrollmentStatus } from "@/lib/tenant/repositories/enrollments";
+import { resolveTenantContext } from "@/lib/tenant/context";
 
 interface Props {
   params: Promise<{ programSlug: string; lessonSlug: string }>;
+  searchParams: Promise<{ enrolled?: string }>;
 }
 
 export const dynamic = "force-dynamic";
@@ -32,18 +38,56 @@ export async function generateMetadata({ params }: Props) {
   return { title: lesson.title, description: lesson.blurb };
 }
 
-export default async function LessonPage({ params }: Props) {
+export default async function LessonPage({ params, searchParams }: Props) {
   const { programSlug, lessonSlug } = await params;
+  const { enrolled } = await searchParams;
   const lesson = await loadHubLesson({ programSlug, lessonSlug });
   if (!lesson) notFound();
 
   const { flat, index } = lesson.navigation;
+  const firstLessonSlug = flat[0]?.slug ?? lesson.slug;
+  const ctx = await resolveTenantContext();
+  const authState =
+    ctx.kind === "anonymous" || ctx.kind === "system" ? "anonymous" : "signed_in";
+
+  const enrollment = PREVIEW_MODE
+    ? { isEnrolled: true, continueLessonSlug: null, firstLessonSlug }
+    : await getProgramEnrollmentStatus(ctx, programSlug);
+
+  const access = PREVIEW_MODE
+    ? { allowed: true as const }
+    : resolveLessonAccess({
+        ctx,
+        programSlug,
+        lessonIndex: index,
+        firstLessonSlug,
+        isEnrolled: enrollment.isEnrolled,
+      });
+
+  if (!access.allowed) {
+    return (
+      <LessonAccessGate
+        programSlug={programSlug}
+        programTitle={lesson.programTitle}
+        lessonTitle={lesson.title}
+        gate={access.gate}
+        authState={authState}
+        previewMode={PREVIEW_MODE}
+      />
+    );
+  }
+
   const prev = index > 0 ? flat[index - 1] : null;
   const next = index >= 0 && index < flat.length - 1 ? flat[index + 1] : null;
   const lessonNumberLabel = String(index + 1).padStart(2, "0");
 
   return (
     <div className="mx-auto w-full max-w-3xl pb-32 pt-10 md:pt-14">
+      <GuestLessonTracker
+        enabled={!PREVIEW_MODE && authState === "anonymous" && index === 0}
+        programId={lesson.programId}
+        lessonVersionId={lesson.lessonVersionId}
+      />
       <nav
         aria-label="Breadcrumb"
         className="mb-12 flex flex-wrap items-baseline gap-x-2 gap-y-1 font-mono text-[0.62rem] uppercase tracking-[0.16em] text-ink-soft"
@@ -62,6 +106,12 @@ export default async function LessonPage({ params }: Props) {
         </span>
         <span>Lesson {lessonNumberLabel}</span>
       </nav>
+
+      {enrolled === "1" ? (
+        <p className="mb-8 font-mono text-[0.62rem] uppercase tracking-[0.16em] text-accent">
+          Enrolled — your progress will be saved to this account.
+        </p>
+      ) : null}
 
       <header className="border-b border-ink/15 pb-10">
         <div className="mb-5 flex items-center gap-3">

@@ -35,8 +35,7 @@ export default function EnrollmentList({ enrollments }: EnrollmentListProps) {
           No enrollments yet.
         </p>
         <p className="mt-4 font-body text-[1.02rem] leading-[1.62] text-ink">
-          Open a program from the hub and start its first lesson. When you enroll, your progress
-          will show up here.
+          Open a program from the hub and enroll to save progress across sessions.
         </p>
         <div className="mt-7">
           <Link
