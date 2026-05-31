@@ -56,6 +56,22 @@ Lessons and quizzes live in **Postgres only** at runtime. Authoring writes go th
 
 Launch program **Arcium** (`program.slug = arcium`) is seeded via migration/script like any other program — not a separate code path. Re-running seed scripts against a database with staff edits can overwrite content; design seeds to be idempotent and safe, and document destructive flags if any.
 
+## Design context (Impeccable)
+
+UI work should follow **`PRODUCT.md`** (strategy) and **`design.md`** (visual tokens + rules). Sidecar: **`.impeccable/design.json`**.
+
+The **Impeccable** skill is vendored at **`.agents/skills/impeccable/`**. In Cursor or Claude Code, invoke **`/i-impeccable`** (or attach the skill) before UI changes. Common commands:
+
+| Command | Use |
+| --- | --- |
+| `/i-impeccable` | Menu + context-aware next step |
+| `/i-impeccable critique <page>` | UX review with scoring |
+| `/i-impeccable audit <area>` | a11y, responsive, perf checks |
+| `/i-impeccable polish <component>` | Pre-ship quality pass |
+| `/i-impeccable document` | Refresh `design.md` from code |
+
+Setup reads `PRODUCT.md` + `design.md` automatically via `node .agents/skills/impeccable/scripts/context.mjs`.
+
 ## Other things
 
 - First launch program slug: **`arcium`**

@@ -1,0 +1,274 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-05-30T00:00:00.000Z",
+  "title": "Design System: Arcademy",
+  "extensions": {
+    "colorMeta": {
+      "accent": {
+        "role": "primary",
+        "displayName": "Editorial Vermillion",
+        "canonical": "oklch(52% 0.16 35)",
+        "tonalRamp": [
+          "oklch(22% 0.08 35)",
+          "oklch(32% 0.12 35)",
+          "oklch(42% 0.14 35)",
+          "oklch(52% 0.16 35)",
+          "oklch(62% 0.14 35)",
+          "oklch(72% 0.10 35)",
+          "oklch(82% 0.06 35)",
+          "oklch(92% 0.03 35)"
+        ]
+      },
+      "paper": {
+        "role": "neutral",
+        "displayName": "Warm Paper",
+        "canonical": "oklch(95% 0.02 85)",
+        "tonalRamp": [
+          "oklch(25% 0.02 85)",
+          "oklch(35% 0.02 85)",
+          "oklch(45% 0.02 85)",
+          "oklch(55% 0.02 85)",
+          "oklch(65% 0.02 85)",
+          "oklch(75% 0.02 85)",
+          "oklch(85% 0.02 85)",
+          "oklch(95% 0.02 85)"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "True Ink",
+        "canonical": "oklch(18% 0.01 85)",
+        "tonalRamp": [
+          "oklch(12% 0.01 85)",
+          "oklch(18% 0.01 85)",
+          "oklch(28% 0.01 85)",
+          "oklch(38% 0.02 85)",
+          "oklch(48% 0.02 85)",
+          "oklch(58% 0.02 85)",
+          "oklch(68% 0.02 85)",
+          "oklch(78% 0.02 85)"
+        ]
+      },
+      "sage": {
+        "role": "secondary",
+        "displayName": "Healthy Sage",
+        "canonical": "oklch(48% 0.06 130)",
+        "tonalRamp": [
+          "oklch(22% 0.04 130)",
+          "oklch(32% 0.05 130)",
+          "oklch(42% 0.06 130)",
+          "oklch(48% 0.06 130)",
+          "oklch(58% 0.05 130)",
+          "oklch(68% 0.04 130)",
+          "oklch(78% 0.03 130)",
+          "oklch(88% 0.02 130)"
+        ]
+      },
+      "ochre": {
+        "role": "secondary",
+        "displayName": "Figure Ochre",
+        "canonical": "oklch(58% 0.12 80)",
+        "tonalRamp": [
+          "oklch(28% 0.06 80)",
+          "oklch(38% 0.08 80)",
+          "oklch(48% 0.10 80)",
+          "oklch(58% 0.12 80)",
+          "oklch(68% 0.10 80)",
+          "oklch(78% 0.08 80)",
+          "oklch(88% 0.05 80)",
+          "oklch(95% 0.03 80)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Lesson and hub page titles only. Clamp max ≤ 4.8rem."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Section titles and quiz heading."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Lesson block headings and staff panel titles."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Lesson prose and UI copy at ~65ch max measure."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Mono uppercase kickers, breadcrumbs, status chips."
+      }
+    },
+    "shadows": [
+      {
+        "name": "leaf",
+        "value": "0 1px 2px rgba(26,24,20,0.05), 0 8px 24px rgba(26,24,20,0.06)",
+        "purpose": "Skip link and nav tooltip only—ambient ink tint."
+      },
+      {
+        "name": "rule-inset",
+        "value": "inset 0 -1px 0 #DED6C2",
+        "purpose": "Hairline separator without full border weight."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-out-expo",
+        "value": "cubic-bezier(0.22, 1, 0.36, 1)",
+        "purpose": "Default UI easing for color, border, and transform."
+      },
+      {
+        "name": "d-snap",
+        "value": "160ms",
+        "purpose": "Micro feedback; zero under prefers-reduced-motion."
+      },
+      {
+        "name": "d-default",
+        "value": "220ms",
+        "purpose": "Standard state transitions."
+      },
+      {
+        "name": "d-handover",
+        "value": "320ms",
+        "purpose": "Layout handoffs such as spine collapse."
+      },
+      {
+        "name": "d-fold",
+        "value": "480ms",
+        "purpose": "Larger panel transitions."
+      }
+    ],
+    "breakpoints": [
+      { "name": "md", "value": "768px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Ink fill CTA; hover shifts to vermillion. Used for Enroll, Submit, Continue.",
+      "html": "<button class=\"ds-btn-primary\" type=\"button\">Enroll in program</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; background: #1A1814; color: #FBF8EF; padding: 14px 24px; font-family: ui-sans-serif, system-ui, sans-serif; font-size: 0.9rem; font-weight: 600; border: none; border-radius: 2px; cursor: pointer; transition: background-color 220ms cubic-bezier(0.22, 1, 0.36, 1), transform 220ms cubic-bezier(0.22, 1, 0.36, 1); } .ds-btn-primary:hover { background: #C5462E; } .ds-btn-primary:focus-visible { outline: 2px solid #C5462E; outline-offset: 2px; } .ds-btn-primary:active { transform: scale(0.98); }"
+    },
+    {
+      "name": "Ghost Link",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Mono caps secondary action with underline on hover.",
+      "html": "<a class=\"ds-link-ghost\" href=\"#\">View curriculum</a>",
+      "css": ".ds-link-ghost { display: inline-flex; align-items: center; gap: 6px; font-family: ui-monospace, monospace; font-size: 0.7rem; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: #4A4438; text-decoration: none; border-bottom: 1px solid #B5AC97; transition: color 220ms cubic-bezier(0.22, 1, 0.36, 1), border-color 220ms cubic-bezier(0.22, 1, 0.36, 1); } .ds-link-ghost:hover { color: #C5462E; border-bottom-color: #C5462E; } .ds-link-ghost:focus-visible { outline: 2px solid #C5462E; outline-offset: 2px; }"
+    },
+    {
+      "name": "Elevated Card",
+      "kind": "card",
+      "refersTo": "card-elevated",
+      "description": "Paper-deep panel with hairline border—hub continue, access gates, quiz wrapper.",
+      "html": "<div class=\"ds-card\"><p class=\"ds-card-kicker\">Continue</p><h3 class=\"ds-card-title\">Pick up where you left off</h3><p class=\"ds-card-body\">Your enrollment progress is saved to this account.</p></div>",
+      "css": ".ds-card { background: #FBF8EF; border: 1px solid rgba(26, 24, 20, 0.15); padding: 32px 40px; border-radius: 2px; } .ds-card-kicker { font-family: ui-monospace, monospace; font-size: 0.66rem; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: #C5462E; margin: 0 0 8px; } .ds-card-title { font-family: ui-sans-serif, system-ui, sans-serif; font-size: 1.55rem; font-weight: 600; letter-spacing: -0.02em; color: #1A1814; margin: 0 0 12px; } .ds-card-body { font-family: ui-sans-serif, system-ui, sans-serif; font-size: 1.02rem; line-height: 1.62; color: #4A4438; margin: 0; max-width: 65ch; }"
+    },
+    {
+      "name": "Status Chip",
+      "kind": "chip",
+      "refersTo": "chip-status",
+      "description": "Staff status and metadata chip with optional sage or accent dot.",
+      "html": "<span class=\"ds-chip\"><span class=\"ds-chip-dot ds-chip-dot-sage\"></span>Draft</span>",
+      "css": ".ds-chip { display: inline-flex; align-items: center; gap: 8px; background: #FBF8EF; border: 1px solid #DED6C2; border-radius: 2px; padding: 4px 10px; font-family: ui-monospace, monospace; font-size: 0.62rem; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #4A4438; } .ds-chip-dot { width: 6px; height: 6px; border-radius: 50%; } .ds-chip-dot-sage { background: #5D6E4C; } .ds-chip-dot-accent { background: #C5462E; }"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "input-field",
+      "description": "Quiz short-answer and staff form fields on paper-deep.",
+      "html": "<label class=\"ds-field\"><span class=\"ds-field-label\">Lesson title</span><input class=\"ds-input\" type=\"text\" placeholder=\"Introduction to Arcium\" /></label>",
+      "css": ".ds-field { display: block; } .ds-field-label { display: block; font-family: ui-monospace, monospace; font-size: 0.62rem; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: #8C8473; margin-bottom: 6px; } .ds-input { width: 100%; background: #FBF8EF; border: 1px solid rgba(26, 24, 20, 0.15); border-radius: 2px; padding: 12px; font-family: ui-sans-serif, system-ui, sans-serif; font-size: 0.98rem; line-height: 1.55; color: #1A1814; transition: border-color 220ms cubic-bezier(0.22, 1, 0.36, 1); } .ds-input::placeholder { color: rgba(140, 132, 115, 0.6); } .ds-input:focus { border-color: #C5462E; outline: none; } .ds-input:focus-visible { outline: 2px solid #C5462E; outline-offset: 2px; }"
+    },
+    {
+      "name": "Portal Kicker",
+      "kind": "custom",
+      "refersTo": "typography.label",
+      "description": "Dominant wayfinding label on lessons and hub sections.",
+      "html": "<span class=\"ds-kicker\">Fundamentals</span>",
+      "css": ".ds-kicker { font-family: ui-monospace, monospace; font-size: 0.66rem; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: #C5462E; }"
+    },
+    {
+      "name": "Lesson Callout",
+      "kind": "custom",
+      "refersTo": "card-elevated",
+      "description": "Note callout with ochre left rule; warning uses accent rule.",
+      "html": "<aside class=\"ds-callout ds-callout-note\"><span class=\"ds-callout-label\">Note</span>You do not need prior cryptography background for this lesson.</aside>",
+      "css": ".ds-callout { margin: 24px 0; border-left: 2px solid #A47E2B; background: #FBF8EF; padding: 16px 20px; font-family: ui-sans-serif, system-ui, sans-serif; font-size: 0.98rem; line-height: 1.6; color: #4A4438; } .ds-callout-note { border-left-color: #A47E2B; } .ds-callout-warning { border-left-color: #C5462E; color: #1A1814; } .ds-callout-label { display: block; margin-bottom: 4px; font-family: ui-monospace, monospace; font-size: 0.58rem; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase; color: #8C8473; }"
+    },
+    {
+      "name": "Staff Nav Active",
+      "kind": "nav",
+      "refersTo": "chip-status",
+      "description": "Staff sidebar active row: sage-soft fill + 4px sage left border.",
+      "html": "<a class=\"ds-nav-item ds-nav-item-active\" href=\"#\">Curriculum</a>",
+      "css": ".ds-nav-item { display: block; padding: 8px 12px; font-family: ui-sans-serif, system-ui, sans-serif; font-size: 0.84rem; font-weight: 500; color: #4A4438; text-decoration: none; border-left: 4px solid transparent; transition: background-color 220ms cubic-bezier(0.22, 1, 0.36, 1); } .ds-nav-item-active { background: #DEE5D2; border-left-color: #5D6E4C; color: #1A1814; } .ds-nav-item:hover { color: #1A1814; } .ds-nav-item:focus-visible { outline: 2px solid #C5462E; outline-offset: 2px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Technical Reader",
+    "overview": "Arcademy looks like a focused technical reader and a precise authoring tool on warm editorial paper—not a consumer LMS, not a marketing site, and not a terminal emulator. Learners get Stripe Docs–like wayfinding and measure; staff get Linear-like density on the same token stack.",
+    "keyCharacteristics": [
+      "Warm paper canvas with ink hierarchy and one vermillion accent",
+      "Geist Sans for UI and lesson prose (Variant A default); Geist Mono for kickers, labels, and status",
+      "Tight editorial radii (2–6px); hairline borders over wide drop shadows",
+      "Reading measure ~62–68ch on lessons; single main column + separated quiz",
+      "Responsive motion with prefers-reduced-motion zeroing all decorative duration",
+      "Hub and Staff Studio share tokens; sage marks staff active nav only"
+    ],
+    "rules": [
+      {
+        "name": "The One Accent Rule",
+        "body": "Vermillion is the only primary saturated accent on any view. It appears on kickers, links, hover fills, and emphasis—not as large background fields across the screen.",
+        "section": "colors"
+      },
+      {
+        "name": "The Warm Paper Rule",
+        "body": "Canvas stays warm editorial paper, not Notion-gray or terminal black. Secondary colors support reading; they do not replace the paper + ink foundation.",
+        "section": "colors"
+      },
+      {
+        "name": "The Kicker Rule",
+        "body": "Mono uppercase kickers carry section identity. One kicker per major region is voice; an eyebrow on every block is AI grammar.",
+        "section": "typography"
+      },
+      {
+        "name": "The Docs Body Rule",
+        "body": "Lesson prose stays Geist Sans until Variant B is explicitly approved. Do not introduce a reading serif without a scoped lesson-prose change.",
+        "section": "typography"
+      },
+      {
+        "name": "The No Ghost Card Rule",
+        "body": "Never pair border: 1px solid with a wide soft drop shadow (blur ≥ 16px) on the same element. Pick hairline border OR a tight shadow, not both as decoration.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Tonal Depth Rule",
+        "body": "Elevation is conveyed by paper step and border, not floating gray cards. Nested cards are forbidden.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do use Tailwind semantic tokens (text-ink, bg-paper-deep, text-accent)—never hard-coded hex in components.",
+      "Do keep one vermillion accent per view and reading measure ~62–68ch on lesson body.",
+      "Do use mono kickers for wayfinding and factual progress copy.",
+      "Do respect prefers-reduced-motion: zero decorative duration; never hide content behind animation gates.",
+      "Do keep staff and hub on warm paper—Linear density, not Notion-gray chrome."
+    ],
+    "donts": [
+      "Don't use a terminal aesthetic—monospace-as-default UI, green-on-black, hacker cosplay.",
+      "Don't ship Notion-gray SaaS—flat anonymous gray surfaces, borderless card stacks, cold admin themes.",
+      "Don't use neon gradient tech—purple/blue hero gradients, glassmorphism, saturated campaign landing patterns.",
+      "Don't add consumer ed-tech patterns—XP, streaks, leaderboards, mascots, level up copy.",
+      "Don't use AI slop scaffolds—tracked uppercase eyebrows on every section, numbered 01/02/03 markers, identical icon-card grids, gradient text.",
+      "Don't pair 1px borders with wide soft shadows on the same card or button.",
+      "Don't add per-partner fonts or arbitrary CSS; partner branding is metadata only."
+    ]
+  }
+}
