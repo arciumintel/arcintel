@@ -1,5 +1,10 @@
 import type { PoolClient } from "pg";
+import type { ContentBlock } from "@/lib/content-blocks/schema";
+import { parseLessonBlocks } from "@/lib/content-blocks/schema";
 import { AppError, ConflictError, NotFoundError } from "@/lib/errors";
+import { isAllowedCloudinaryUrl } from "@/lib/media/cloudinary-url";
+import type { QuizQuestion, ScoringConfig } from "@/lib/quiz/schema";
+import { parseQuizQuestions, parseScoringConfig } from "@/lib/quiz/schema";
 import { withTenantTransaction } from "@/lib/db";
 import { toTenantSession, type TenantContext } from "@/lib/tenant/context";
 import { requireStaff } from "@/lib/tenant/require-staff";
@@ -40,6 +45,14 @@ export type StaffLessonRow = {
 
 export type StaffWorkspaceLesson = StaffLessonRow & {
   id: string;
+};
+
+export type StaffWorkspaceLessonContent = StaffWorkspaceLesson & {
+  blocks: ContentBlock[];
+  quiz: {
+    questions: QuizQuestion[];
+    scoringConfig: ScoringConfig;
+  } | null;
 };
 
 type ProgramRow = {
@@ -257,6 +270,94 @@ async function listWorkspaceLessonsInTrack(
     title: lesson.title.en ?? Object.values(lesson.title)[0] ?? lesson.slug,
     position: lesson.position,
   }));
+}
+
+function assertAllowedBlockMedia(blocks: ContentBlock[]) {
+  for (const block of blocks) {
+    if (block.type === "image" && !isAllowedCloudinaryUrl(block.cloudinary_url)) {
+      throw new AppError("Image URL must be from the configured Cloudinary account.", 400);
+    }
+  }
+}
+
+function assertAllowedQuizMedia(questions: QuizQuestion[]) {
+  for (const question of questions) {
+    if (
+      question.image &&
+      !isAllowedCloudinaryUrl(question.image.cloudinary_url)
+    ) {
+      throw new AppError("Quiz image URL must be from the configured Cloudinary account.", 400);
+    }
+  }
+}
+
+async function getWorkspaceLessonRow(
+  client: PoolClient,
+  trackId: string,
+  lessonSlug: string,
+) {
+  const { rows } = await client.query<{
+    id: string;
+    slug: string;
+    title: Record<string, string>;
+    position: number;
+    blocks: unknown;
+    quiz_version_id: string | null;
+    questions: unknown | null;
+    scoring_config: unknown | null;
+  }>(
+    `select lv.id,
+            lv.slug,
+            lv.title,
+            lv.position,
+            lv.blocks,
+            lv.quiz_version_id,
+            qv.questions,
+            qv.scoring_config
+     from lesson_version lv
+     left join quiz_version qv on qv.id = lv.quiz_version_id
+     where lv.track_id = $1
+       and lv.slug = $2
+     limit 1`,
+    [trackId, lessonSlug],
+  );
+
+  const lesson = rows[0];
+  if (!lesson) {
+    throw new NotFoundError();
+  }
+
+  return lesson;
+}
+
+function mapWorkspaceLessonContent(
+  lesson: Awaited<ReturnType<typeof getWorkspaceLessonRow>>,
+): StaffWorkspaceLessonContent {
+  const blocks = parseLessonBlocks(lesson.blocks);
+  if (!blocks.success) {
+    throw new AppError("Stored lesson blocks are invalid.", 500);
+  }
+
+  let quiz: StaffWorkspaceLessonContent["quiz"] = null;
+  if (lesson.quiz_version_id && lesson.questions && lesson.scoring_config) {
+    const questions = parseQuizQuestions(lesson.questions);
+    const scoringConfig = parseScoringConfig(lesson.scoring_config);
+    if (questions.success && scoringConfig.success) {
+      quiz = {
+        questions: questions.data,
+        scoringConfig: scoringConfig.data,
+      };
+    }
+  }
+
+  return {
+    id: lesson.id,
+    slug: lesson.slug,
+    title: lesson.title.en ?? Object.values(lesson.title)[0] ?? lesson.slug,
+    position: lesson.position,
+    blocks: blocks.data,
+    quiz,
+  };
 }
 
 async function compactLessonPositions(client: PoolClient, trackId: string) {
@@ -745,6 +846,180 @@ export async function reorderDraftLesson(
     await client.query(
       `update lesson_version set position = $1 where id = $2`,
       [adjacent.position, currentId],
+    );
+
+    await client.query(`update program set updated_at = now() where id = $1`, [
+      row.program_id,
+    ]);
+  });
+}
+
+export async function getWorkspaceLessonContent(
+  ctx: TenantContext,
+  input: { orgSlug: string; programSlug: string; lessonSlug: string },
+): Promise<StaffWorkspaceLessonContent> {
+  requireStaff(ctx);
+
+  return withTenantTransaction(toTenantSession(ctx), async (client) => {
+    const { trackId } = await getWorkspaceContext(
+      client,
+      input.orgSlug,
+      input.programSlug,
+    );
+
+    if (!trackId) {
+      throw new NotFoundError();
+    }
+
+    const lesson = await getWorkspaceLessonRow(client, trackId, input.lessonSlug);
+    return mapWorkspaceLessonContent(lesson);
+  });
+}
+
+export async function updateDraftLessonBlocks(
+  ctx: TenantContext,
+  input: {
+    orgSlug: string;
+    programSlug: string;
+    lessonSlug: string;
+    blocks: ContentBlock[];
+  },
+): Promise<void> {
+  requireStaff(ctx);
+
+  assertAllowedBlockMedia(input.blocks);
+
+  await withTenantTransaction(toTenantSession(ctx), async (client) => {
+    const { row, trackId } = await getWorkspaceContext(
+      client,
+      input.orgSlug,
+      input.programSlug,
+    );
+
+    if (!trackId) {
+      throw new NotFoundError();
+    }
+
+    const lesson = await getWorkspaceLessonRow(client, trackId, input.lessonSlug);
+
+    const { rowCount } = await client.query(
+      `update lesson_version
+       set blocks = $2::jsonb
+       where id = $1`,
+      [lesson.id, JSON.stringify(input.blocks)],
+    );
+
+    if (!rowCount) {
+      throw new NotFoundError();
+    }
+
+    await client.query(`update program set updated_at = now() where id = $1`, [
+      row.program_id,
+    ]);
+  });
+}
+
+export async function upsertDraftLessonQuiz(
+  ctx: TenantContext,
+  input: {
+    orgSlug: string;
+    programSlug: string;
+    lessonSlug: string;
+    questions: QuizQuestion[];
+    scoringConfig: ScoringConfig;
+  },
+): Promise<void> {
+  requireStaff(ctx);
+
+  assertAllowedQuizMedia(input.questions);
+
+  await withTenantTransaction(toTenantSession(ctx), async (client) => {
+    const { row, trackId } = await getWorkspaceContext(
+      client,
+      input.orgSlug,
+      input.programSlug,
+    );
+
+    if (!trackId) {
+      throw new NotFoundError();
+    }
+
+    const lesson = await getWorkspaceLessonRow(client, trackId, input.lessonSlug);
+
+    if (lesson.quiz_version_id) {
+      const { rowCount } = await client.query(
+        `update quiz_version
+         set questions = $2::jsonb,
+             scoring_config = $3::jsonb
+         where id = $1`,
+        [
+          lesson.quiz_version_id,
+          JSON.stringify(input.questions),
+          JSON.stringify(input.scoringConfig),
+        ],
+      );
+
+      if (!rowCount) {
+        throw new NotFoundError();
+      }
+    } else {
+      const inserted = await client.query<{ id: string }>(
+        `insert into quiz_version (questions, scoring_config)
+         values ($1::jsonb, $2::jsonb)
+         returning id`,
+        [
+          JSON.stringify(input.questions),
+          JSON.stringify(input.scoringConfig),
+        ],
+      );
+
+      const quizVersionId = inserted.rows[0]?.id;
+      if (!quizVersionId) {
+        throw new AppError("Could not create quiz version.", 500);
+      }
+
+      await client.query(
+        `update lesson_version
+         set quiz_version_id = $2
+         where id = $1`,
+        [lesson.id, quizVersionId],
+      );
+    }
+
+    await client.query(`update program set updated_at = now() where id = $1`, [
+      row.program_id,
+    ]);
+  });
+}
+
+export async function clearDraftLessonQuiz(
+  ctx: TenantContext,
+  input: { orgSlug: string; programSlug: string; lessonSlug: string },
+): Promise<void> {
+  requireStaff(ctx);
+
+  await withTenantTransaction(toTenantSession(ctx), async (client) => {
+    const { row, trackId } = await getWorkspaceContext(
+      client,
+      input.orgSlug,
+      input.programSlug,
+    );
+
+    if (!trackId) {
+      throw new NotFoundError();
+    }
+
+    const lesson = await getWorkspaceLessonRow(client, trackId, input.lessonSlug);
+
+    if (!lesson.quiz_version_id) {
+      return;
+    }
+
+    await client.query(
+      `update lesson_version
+       set quiz_version_id = null
+       where id = $1`,
+      [lesson.id],
     );
 
     await client.query(`update program set updated_at = now() where id = $1`, [

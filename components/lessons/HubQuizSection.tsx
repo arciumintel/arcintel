@@ -1,4 +1,5 @@
 import type { HubQuizView } from "@/lib/hub/types";
+import { quizImageDeliveryUrl } from "@/lib/media/lesson-image-url";
 
 export default function HubQuizSection({ quiz }: { quiz: HubQuizView }) {
   return (
@@ -34,9 +35,11 @@ export default function HubQuizSection({ quiz }: { quiz: HubQuizView }) {
                 <figure className="mb-4">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={question.image.cloudinary_url}
+                    src={quizImageDeliveryUrl(question.image.cloudinary_url)}
                     alt={question.image.alt}
                     className="block w-full max-w-2xl border border-ink/15"
+                    loading="lazy"
+                    decoding="async"
                   />
                 </figure>
               ) : null}

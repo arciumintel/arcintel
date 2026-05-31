@@ -1,0 +1,137 @@
+flowchart TD
+    %% === PROJECT GOALS ===
+    %% Ultimate Goal: Arcademy ships as ecosystem onboarding infrastructure — curated hub, versioned programs, staff-authored content, measurable learner progress for the Arcium ecosystem.
+
+    %% === START ===
+    %% @project_start [start, closed]
+    project_start("Project Start<br/><sub>Arcademy (arcintel): greenfield onboarding platform<br/>Next.js 16 · Neon Postgres · better-auth · Cloudinary</sub>")
+
+    %% @ultimate_goal [end, opened]
+    ultimate_goal("v1 Launch<br/><sub>Hub live with Arcium program; staff can author,<br/>publish, and list programs; learners enroll with<br/>version-pinned progress and guest merge</sub>")
+
+    %% === PHASE 0 — FOUNDATION [closed] ===
+    %% @phase0 [ai-task, closed]
+    phase0("Phase 0 · Tenancy foundation<br/><sub>Migrations, RLS, repositories, block/quiz schemas,<br/>Arcium seed, cross-tenant isolation tests</sub>")
+
+    %% @phase0_rls [ai-task, closed]
+    phase0_rls("RLS + withTenantTransaction<br/><sub>Scoped data access; no raw query() in routes;<br/>DATABASE_URL_UNPOOLED for tenant writes</sub>")
+
+    %% === PHASE 1 — HUB + LEARNER LOOP [closed] ===
+    %% @phase1_hub [ai-task, closed]
+    phase1_hub("Phase 1 · Hub + onboarding loop<br/><sub>/programs catalog, lesson player, enrollments,<br/>guest lesson 1 + merge on signup, OAuth auth</sub>")
+
+    %% @phase1_design [ai-task, closed]
+    phase1_design("Editorial design system<br/><sub>Geist fonts, warm paper tokens, hub UI,<br/>LessonBlockRenderer for structured blocks</sub>")
+
+    %% === STAFF STUDIO — SLICES A–C ===
+    %% @staff_slice_a [ai-task, closed]
+    staff_slice_a("Staff Slice A · Program shell<br/><sub>Create org/program, overview, settings,<br/>first-lesson stub, StaffProgramShell nav</sub>")
+
+    %% @staff_slice_b [ai-task, closed]
+    staff_slice_b("Staff Slice B · Curriculum outline<br/><sub>Add/reorder/edit/delete draft lessons;<br/>single main track; lesson workspace route</sub>")
+
+    %% @cloudinary_upload [ai-task, closed]
+    cloudinary_upload("Staff Cloudinary upload<br/><sub>/api/staff/media/upload, allowlist validation,<br/>CLOUDINARY_URL in .env.local</sub>")
+
+    %% @staff_slice_c [ai-task, closed]
+    staff_slice_c("Staff Slice C · Lesson editor<br/><sub>Block editor, quiz panel, inline preview;<br/>save draft blocks/quiz to Postgres workspace</sub>")
+
+    %% @lesson_image_quality [ai-task, closed]
+    lesson_image_quality("Lesson image guidance + delivery<br/><sub>1600×900 recommended; Cloudinary w_1600 transforms<br/>at render; upload hints in staff editor</sub>")
+
+    %% @staff_nav_link [ai-task, closed]
+    staff_nav_link("Staff header link<br/><sub>Staff users see Staff → /staff/organizations<br/>in hub top bar when logged in</sub>")
+
+    %% === IN PROGRESS / NEXT ===
+    %% @staff_slice_d [ai-task, opened]
+    staff_slice_d("Staff Slice D · Publish<br/><sub>Validate draft → immutable curriculum_version snapshot;<br/>set active_published_version_id; hub_status curation</sub>")
+
+    %% @hub_internal_programs [ai-task, opened]
+    hub_internal_programs("Hub listing for published programs<br/><sub>Move programs from internal → listed/featured;<br/>Arcium visible on /programs after publish</sub>")
+
+    %% @preview_tokens [ai-task, opened]
+    preview_tokens("Partner preview tokens<br/><sub>Draft preview URLs before publish — open question #3</sub>")
+
+    %% === LATER PHASES ===
+    %% @phase2_partner [ai-task, opened]
+    phase2_partner("Phase 2 · Partner onboarding<br/><sub>Intake briefs, analytics rollups,<br/>staff approval before hub listing</sub>")
+
+    %% @phase3_trusted [ai-task, opened]
+    phase3_trusted("Phase 3 · Trusted partner drafts<br/><sub>Partner Studio, approval queue, trust admin</sub>")
+
+    %% === DECISIONS (reference nodes) ===
+    %% @decision_waterfall [decision, closed]
+    decision_waterfall("Decision · Strict build order<br/><sub>Phase 0 → hub → Staff B → C → publish (week 4);<br/>no skipping tenancy or publish immutability</sub>")
+
+    %% @decision_staff_only [decision, closed]
+    decision_staff_only("Decision · Staff-only authoring (4 wk)<br/><sub>Generic programs, single hidden main track,<br/>Up/Down reorder; quiz warn-only at publish</sub>")
+
+    %% @decision_immutable [decision, closed]
+    decision_immutable("Decision · Published content immutable<br/><sub>Edits on draft workspace only; publish creates<br/>new lesson_version / quiz_version snapshots</sub>")
+
+    %% === BLOCKERS / DEBT ===
+    %% @debt_flaky_test [blocker, opened]
+    debt_flaky_test("Tech debt · Flaky isolation test<br/><sub>tenant-isolation.test.ts under parallel Vitest —<br/>fileParallelism:false helps; not a security bug</sub>")
+
+    %% === CONNECTIONS ===
+    project_start --> phase0
+    phase0 --> phase0_rls
+    phase0_rls --> phase1_design
+    phase1_design --> phase1_hub
+
+    phase1_hub --> decision_waterfall
+    decision_waterfall --> staff_slice_a
+    staff_slice_a --> staff_slice_b
+    staff_slice_b --> cloudinary_upload
+    cloudinary_upload --> staff_slice_c
+    staff_slice_c --> lesson_image_quality
+    lesson_image_quality --> staff_nav_link
+
+    staff_nav_link --> staff_slice_d
+    staff_slice_d --> hub_internal_programs
+    hub_internal_programs --> ultimate_goal
+
+    staff_slice_d -.-> preview_tokens
+    hub_internal_programs -.-> phase2_partner
+    phase2_partner --> phase3_trusted
+    phase3_trusted -.-> ultimate_goal
+
+    decision_staff_only -.-> staff_slice_b
+    decision_immutable -.-> staff_slice_c
+    decision_immutable -.-> staff_slice_d
+
+    debt_flaky_test -.-> phase0_rls
+
+    %% === RECENT WORK ===
+    subgraph recent [RECENT]
+        staff_slice_c
+        lesson_image_quality
+        staff_nav_link
+    end
+
+    %% === STYLES ===
+    style project_start fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+
+    style phase0 fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style phase0_rls fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style phase1_hub fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style phase1_design fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style staff_slice_a fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style staff_slice_b fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style cloudinary_upload fill:#1a1a2e,stroke:#a78bfa,color:#c4b5fd,stroke-width:1px
+    style decision_waterfall fill:#1a1a2e,stroke:#64748b,color:#94a3b8,stroke-width:1px
+    style decision_staff_only fill:#1a1a2e,stroke:#64748b,color:#94a3b8,stroke-width:1px
+    style decision_immutable fill:#1a1a2e,stroke:#64748b,color:#94a3b8,stroke-width:1px
+
+    style staff_slice_c fill:#2d1f4e,stroke:#c084fc,color:#e9d5ff,stroke-width:2px
+    style lesson_image_quality fill:#2d1f4e,stroke:#c084fc,color:#e9d5ff,stroke-width:2px
+    style staff_nav_link fill:#2d1f4e,stroke:#c084fc,color:#e9d5ff,stroke-width:2px
+    style recent fill:transparent,stroke:#c084fc,color:#c084fc,stroke-width:2px,stroke-dasharray:5 5
+
+    style ultimate_goal fill:#1a1a2e,stroke:#4ade80,color:#86efac,stroke-width:1px
+    style staff_slice_d fill:#1a1a2e,stroke:#4ade80,color:#86efac,stroke-width:1px
+    style hub_internal_programs fill:#1a1a2e,stroke:#4ade80,color:#86efac,stroke-width:1px
+    style preview_tokens fill:#1a1a2e,stroke:#4ade80,color:#86efac,stroke-width:1px
+    style phase2_partner fill:#1a1a2e,stroke:#4ade80,color:#86efac,stroke-width:1px
+    style phase3_trusted fill:#1a1a2e,stroke:#4ade80,color:#86efac,stroke-width:1px
+    style debt_flaky_test fill:#1a1a2e,stroke:#f87171,color:#fca5a5,stroke-width:1px

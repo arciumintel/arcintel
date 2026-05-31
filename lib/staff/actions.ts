@@ -12,13 +12,21 @@ import {
   updateProgramDetailsSchema,
 } from "@/lib/validation/staff-program";
 import {
+  clearDraftLessonQuiz,
   createDraftLesson,
   createProgram,
   deleteDraftLesson,
   reorderDraftLesson,
+  updateDraftLessonBlocks,
   updateDraftLessonMetadata,
   updateProgramDetails,
+  upsertDraftLessonQuiz,
 } from "@/lib/tenant/repositories/staff-programs";
+import {
+  saveDraftLessonBlocksSchema,
+  saveDraftLessonQuizSchema,
+} from "@/lib/validation/staff-lesson";
+import { formatLessonBlockSaveErrors } from "@/lib/validation/format-lesson-errors";
 import { AppError, ConflictError } from "@/lib/errors";
 
 export type StaffActionResult = {
@@ -36,6 +44,32 @@ function staffProgramPaths(orgSlug: string, programSlug: string) {
     base,
     curriculum: `${base}/curriculum`,
   };
+}
+
+function staffLessonPath(
+  orgSlug: string,
+  programSlug: string,
+  lessonSlug: string,
+) {
+  return `/staff/organizations/${orgSlug}/programs/${programSlug}/curriculum/lessons/${lessonSlug}`;
+}
+
+function parseJsonField(value: FormDataEntryValue | null, field: string) {
+  if (typeof value !== "string" || !value.trim()) {
+    return {
+      ok: false as const,
+      errors: { [field]: ["Invalid JSON payload."] },
+    };
+  }
+
+  try {
+    return { ok: true as const, data: JSON.parse(value) as unknown };
+  } catch {
+    return {
+      ok: false as const,
+      errors: { [field]: ["Invalid JSON payload."] },
+    };
+  }
 }
 
 function revalidateStaffProgram(orgSlug: string, programSlug: string) {
@@ -236,6 +270,99 @@ export async function reorderDraftLessonAction(
   });
 
   revalidateStaffProgram(orgSlug, programSlug);
+}
+
+export async function saveDraftLessonBlocksAction(
+  orgSlug: string,
+  programSlug: string,
+  lessonSlug: string,
+  _prev: StaffActionResult | undefined,
+  formData: FormData,
+): Promise<StaffActionResult | undefined> {
+  const ctx = await resolveTenantContext();
+  requireStaff(ctx);
+
+  const json = parseJsonField(formData.get("blocks"), "blocks");
+  if (!json.ok) {
+    return { ok: false, errors: json.errors };
+  }
+
+  const parsed = saveDraftLessonBlocksSchema.safeParse({ blocks: json.data });
+  if (!parsed.success) {
+    const messages = formatLessonBlockSaveErrors(parsed.error, json.data as unknown[]);
+    return { ok: false, errors: { blocks: messages } };
+  }
+
+  try {
+    await updateDraftLessonBlocks(ctx, {
+      orgSlug,
+      programSlug,
+      lessonSlug,
+      blocks: parsed.data.blocks,
+    });
+
+    revalidateStaffProgram(orgSlug, programSlug);
+    revalidatePath(staffLessonPath(orgSlug, programSlug, lessonSlug));
+    return undefined;
+  } catch (error) {
+    if (error instanceof AppError && error.status === 400) {
+      return { ok: false, errors: { blocks: [error.message] } };
+    }
+    throw error;
+  }
+}
+
+export async function saveDraftLessonQuizAction(
+  orgSlug: string,
+  programSlug: string,
+  lessonSlug: string,
+  _prev: StaffActionResult | undefined,
+  formData: FormData,
+): Promise<StaffActionResult | undefined> {
+  const ctx = await resolveTenantContext();
+  requireStaff(ctx);
+
+  const json = parseJsonField(formData.get("quiz"), "quiz");
+  if (!json.ok) {
+    return { ok: false, errors: json.errors };
+  }
+
+  const parsed = saveDraftLessonQuizSchema.safeParse(json.data);
+  if (!parsed.success) {
+    return { ok: false, errors: fieldErrors(parsed.error) };
+  }
+
+  try {
+    await upsertDraftLessonQuiz(ctx, {
+      orgSlug,
+      programSlug,
+      lessonSlug,
+      questions: parsed.data.questions,
+      scoringConfig: parsed.data.scoringConfig,
+    });
+
+    revalidateStaffProgram(orgSlug, programSlug);
+    revalidatePath(staffLessonPath(orgSlug, programSlug, lessonSlug));
+    return undefined;
+  } catch (error) {
+    if (error instanceof AppError && error.status === 400) {
+      return { ok: false, errors: { quiz: [error.message] } };
+    }
+    throw error;
+  }
+}
+
+export async function clearDraftLessonQuizAction(
+  orgSlug: string,
+  programSlug: string,
+  lessonSlug: string,
+) {
+  const ctx = await resolveTenantContext();
+  requireStaff(ctx);
+
+  await clearDraftLessonQuiz(ctx, { orgSlug, programSlug, lessonSlug });
+  revalidateStaffProgram(orgSlug, programSlug);
+  revalidatePath(staffLessonPath(orgSlug, programSlug, lessonSlug));
 }
 
 export async function deleteDraftLessonAction(

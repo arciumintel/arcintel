@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const EASE = "cubic-bezier(0.22,1,0.36,1)";
@@ -26,7 +27,11 @@ function capitalize(s: string): string {
   return s.length === 0 ? s : s.charAt(0).toUpperCase() + s.slice(1).replace(/-/g, " ");
 }
 
-export default function PortalTopBar() {
+type PortalTopBarProps = {
+  isStaff?: boolean;
+};
+
+export default function PortalTopBar({ isStaff = false }: PortalTopBarProps) {
   const pathname = usePathname() || "/";
   const title = deriveTitle(pathname);
   const isHome = pathname === "/";
@@ -68,6 +73,15 @@ export default function PortalTopBar() {
             </h1>
           )}
         </div>
+
+        {isStaff ? (
+          <Link
+            href="/staff/organizations"
+            className="shrink-0 font-mono text-[0.62rem] uppercase tracking-[0.16em] text-accent transition-colors hover:text-accent-deep"
+          >
+            Staff
+          </Link>
+        ) : null}
       </div>
       <span aria-hidden className="block h-px w-full bg-ink/10" />
     </header>

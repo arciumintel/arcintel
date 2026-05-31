@@ -3,6 +3,7 @@ import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import PortalShell from "@/components/portal/PortalShell";
 import GuestMergeRunner from "@/components/guest/GuestMergeRunner";
+import { resolveTenantContext } from "@/lib/tenant/context";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -21,11 +22,13 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const ctx = await resolveTenantContext();
+
   return (
     <html
       lang="en"
@@ -33,7 +36,7 @@ export default function RootLayout({
     >
       <body className="min-h-screen bg-background font-sans text-ink antialiased selection:bg-accent-soft selection:text-ink">
         <GuestMergeRunner />
-        <PortalShell>{children}</PortalShell>
+        <PortalShell isStaff={ctx.isStaff}>{children}</PortalShell>
       </body>
     </html>
   );

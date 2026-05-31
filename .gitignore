@@ -45,6 +45,7 @@ ehthumbs.db
 .agent/
 .claude/
 .continue/
+.vizvibe-state.json
 
 # Turbo / cache
 .turbo/

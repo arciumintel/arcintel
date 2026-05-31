@@ -1,4 +1,5 @@
 import type { ContentBlock } from "@/lib/content-blocks/schema";
+import { lessonImageDeliveryUrl } from "@/lib/media/lesson-image-url";
 
 /**
  * Sanitised renderer for the v1 block set: heading | paragraph | callout |
@@ -78,9 +79,11 @@ function Block({ block }: { block: ContentBlock }) {
       <figure className="my-8">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src={block.cloudinary_url}
+          src={lessonImageDeliveryUrl(block.cloudinary_url)}
           alt={block.alt.en}
           className="block w-full border border-ink/15"
+          loading="lazy"
+          decoding="async"
         />
         {block.caption ? (
           <figcaption className="mt-3 text-center font-mono text-[0.62rem] uppercase tracking-[0.16em] text-ink-soft">

@@ -54,8 +54,8 @@ export default function CreateDraftLessonForm({
         </h2>
         <p className="mt-2 font-body text-body-sm text-ink-muted">
           {isFirst
-            ? "You will add content blocks and a quiz in a later step. For now, set a title and URL slug."
-            : "Set a title and slug. Content editing comes in the next slice."}
+            ? "Set a title and slug, then open the lesson to add blocks and an optional quiz."
+            : "Set a title and slug, then edit content on the lesson page."}
         </p>
 
         <div className="mt-8 space-y-5">

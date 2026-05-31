@@ -8,7 +8,13 @@ import { SpineProvider, useSpine } from "./SpineContext";
 
 const EASE = "cubic-bezier(0.22,1,0.36,1)";
 
-function ShellInner({ children }: { children: ReactNode }) {
+function ShellInner({
+  children,
+  isStaff,
+}: {
+  children: ReactNode;
+  isStaff: boolean;
+}) {
   const { collapsed } = useSpine();
   const pathname = usePathname();
 
@@ -37,7 +43,7 @@ function ShellInner({ children }: { children: ReactNode }) {
         `}</style>
 
         <div className="flex min-w-0 flex-1 flex-col pb-24 md:pb-0">
-          <PortalTopBar />
+          <PortalTopBar isStaff={isStaff} />
           <main
             id="main-content"
             className="relative z-0 w-full flex-1 overflow-x-clip"
@@ -61,10 +67,16 @@ function ShellInner({ children }: { children: ReactNode }) {
   );
 }
 
-export default function PortalShell({ children }: { children: ReactNode }) {
+export default function PortalShell({
+  children,
+  isStaff = false,
+}: {
+  children: ReactNode;
+  isStaff?: boolean;
+}) {
   return (
     <SpineProvider>
-      <ShellInner>{children}</ShellInner>
+      <ShellInner isStaff={isStaff}>{children}</ShellInner>
     </SpineProvider>
   );
 }
